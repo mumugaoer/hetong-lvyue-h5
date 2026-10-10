@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  XXGS 合同管理系统 · 合同履约 H5 查询组件（H03卡片列表 + T6履约域派生）
+  原型标准契约（PROTO-CONTRACT v1）：
+  1. 单文件自包含：样式全内联，禁止外部 CDN / 字体 / JS。
+  2. 交互一律纯 CSS（radio 过滤 / checkbox 弹窗），禁 JS。
+  3. 受保护区域（PROTO-LOCK）禁止改动。
+  ============================================================
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合同履约 · H5查询组件</title>
+<style>
+  :root {
+    --primary: #2978FF;
+    --primary-deep: #0468DC;
+    --grad-cta: linear-gradient(90deg,#165DFF 0%,#008CFF 100%);
+    --success: #52C41A;
+    --warning: #FA8C16;
+    --error: #DD473A;
+    --purple: #5554E9;
+    --teal: #10ACBA;
+    --gray: #7484A5;
+    --t1: #051537;
+    --t2: #465065;
+    --t3: #9BA1AF;
+    --t4: #86909C;
+    --border: #E4E7ED;
+    --line: #F2F4F5;
+    --bg-page: #F7F7F7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* 交互控件统一隐藏：页签/弹窗均由页面按钮经 label 联动触发 */
+  input[type="radio"], input[type="checkbox"] { display: none; }
+  html { background: #E8ECF2; -webkit-text-size-adjust: 100%; }
+  body {
+    max-width: 375px;
+    margin: 0 auto;
+    box-shadow: 0 0 24px rgba(5,21,55,0.14);
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+    background: #F7F7F7;
+    color: var(--t1);
+  }
+  .app { max-width: 375px; margin: 0 auto; min-height: 100vh; background: var(--bg-page); position: relative; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+  svg { display: inline-block; vertical-align: middle; }
+
+  /* ===== 导航栏 44px ===== */
+  .nav { height: 44px; background: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--line); }
+  .nav .back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; }
+  .nav .title { position: absolute; left: 50%; transform: translateX(-50%); font-size: 18px; font-weight: 500; color: #1D2129; letter-spacing: .5px; }
+  .nav .actions { display: flex; gap: 8px; }
+  .nav .icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: #F2F3F5; border-radius: 16px; cursor: pointer; }
+
+  /* ===== 搜索区（含筛选入口 · C09） ===== */
+  .search-bar { background: #FFFFFF; padding: 10px 16px 12px; display: flex; align-items: center; gap: 10px; }
+  .search-bar .search-box { flex: 1; }
+  .search-box svg { flex-shrink: 0; }
+  .search-box { display: flex; align-items: center; gap: 8px; height: 32px; background: #F7F7F7; border: 1px solid #E5E6EB; border-radius: 16px; padding: 0 12px; }
+  .search-box input { flex: 1; border: none; background: transparent; outline: none; font-size: 14px; color: var(--t1); min-width: 0; }
+  .search-box input::placeholder { color: #C9CDD4; }
+
+  /* ===== 状态 Tab ===== */
+  .tag-bar { background: #FFFFFF; padding: 0 16px 10px; display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tag-bar::-webkit-scrollbar { display: none; }
+  .tag-bar .tag { flex-shrink: 0; padding: 5px 14px; border-radius: 3px; font-size: 12px; line-height: 16px; border: 1px solid transparent; color: #4E5969; background: #F2F3F5; cursor: pointer; user-select: none; }
+  #tab-all:checked   ~ .app .tag-bar .tg-all,
+  #tab-doing:checked ~ .app .tag-bar .tg-doing,
+  #tab-unfin:checked ~ .app .tag-bar .tg-unfin,
+  #tab-overdue:checked ~ .app .tag-bar .tg-overdue,
+  #tab-done:checked  ~ .app .tag-bar .tg-done { color: #FFFFFF; background: var(--primary); font-weight: 500; }
+
+  /* ===== 视图页签（履约任务 | 合同进度） ===== */
+  .seg { display: flex; background: #FFFFFF; border-bottom: 1px solid var(--line); position: sticky; top: 44px; z-index: 99; }
+  .seg .sg { flex: 1; text-align: center; padding: 11px 0 9px; font-size: 16px; color: #1D2129; cursor: pointer; user-select: none; position: relative; }
+  #view-task:checked ~ .app .seg .sg-task,
+  #view-contract:checked ~ .app .seg .sg-con { color: var(--primary); font-weight: 600; }
+  #view-task:checked ~ .app .seg .sg-task::after,
+  #view-contract:checked ~ .app .seg .sg-con::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; width: 84px; height: 3px; border-radius: 2px; background: var(--primary); }
+
+  /* 视图切换 */
+  #view-task:checked     ~ .app .view-contract-wrap { display: none; }
+  #view-contract:checked ~ .app .view-task-wrap { display: none; }
+
+  /* ===== 任务状态Tab ===== */
+  .ttag-bar { background: #FFFFFF; padding: 0 16px 10px; display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent 100%); mask-image: linear-gradient(90deg, #000 88%, transparent 100%); }
+  .ttag-bar::-webkit-scrollbar { display: none; }
+  .ttag { flex-shrink: 0; padding: 4px 11px; border-radius: 3px; font-size: 11px; line-height: 16px; border: 1px solid transparent; color: #4E5969; background: #F2F3F5; cursor: pointer; user-select: none; }
+  #t-all:checked     ~ .app .ttag-bar .tt-all,
+  #t-doing:checked   ~ .app .ttag-bar .tt-doing,
+  #t-unfin:checked   ~ .app .ttag-bar .tt-unfin,
+  #t-overdue:checked ~ .app .ttag-bar .tt-overdue,
+  #t-term:checked    ~ .app .ttag-bar .tt-term,
+  #t-done:checked    ~ .app .ttag-bar .tt-done { color: #FFFFFF; background: var(--primary); font-weight: 500; }
+
+  /* ===== 任务卡片列表 ===== */
+  .view-task-wrap { background: var(--bg-page); padding-bottom: 4px; }
+  .task-list { padding: 12px 16px 4px; }
+  .task-list .tcard { display: none; background: #FFFFFF; border-radius: 12px; box-shadow: 0 2px 12px rgba(5,21,55,0.10); padding: 14px 16px 12px; margin-bottom: 12px; }
+  #t-all:checked     ~ .app .task-list .tcard { display: block; }
+  #t-doing:checked   ~ .app .task-list .t-doing { display: block; }
+  #t-unfin:checked   ~ .app .task-list .t-unfin { display: block; }
+  #t-overdue:checked ~ .app .task-list .t-overdue { display: block; }
+  #t-term:checked    ~ .app .task-list .t-term { display: block; }
+  #t-done:checked    ~ .app .task-list .t-done { display: block; }
+  .tcard .pts { display: flex; gap: 6px; }
+  .view-contract-wrap { background: var(--bg-page); }
+
+  /* 履约类型徽标（主色实底白字） */
+  .pt-pay { color: var(--primary); background: rgba(41,120,255,0.10); }
+  .pt-dep { color: var(--primary); background: rgba(41,120,255,0.10); }
+  .num-g { color: var(--success); font-weight: 600; }
+  .num-r { color: #DD473A; font-weight: 600; }
+  /* 节点可展开（纯CSS details/summary） */
+  .tl-item .node-det { margin-top: 6px; }
+  .tl-item .node-det summary { list-style: none; display: flex; align-items: center; justify-content: center; gap: 4px; height: 30px; padding: 0 12px; margin: 0 auto 0 0; width: fit-content; border-radius: 15px; background: #FFFFFF; border: 1px solid rgba(41,120,255,0.35); font-size: 12px; color: var(--primary); font-weight: 500; cursor: pointer; user-select: none; }
+  .tl-item .node-det summary::-webkit-details-marker { display: none; }
+  .tl-item .node-det summary::after { content: "展开详情"; }
+  .tl-item .node-det[open] summary::after { content: "收起详情"; }
+  .tl-item .node-det summary:active { background: rgba(41,120,255,0.06); }
+  .tl-item .node-det .chev { transition: transform .18s ease; }
+  .tl-item .node-det[open] .chev { transform: rotate(180deg); }
+  .tl-item .node-det[open] summary { background: rgba(41,120,255,0.07); border-color: var(--primary); }
+
+  /* 展开详情面板：卡片式，行内值右对齐 */
+  .node-det-body { margin-top: 10px; padding: 4px 14px 12px; background: #FFFFFF; border: 1px solid #E4EAF2; border-left: 2px solid var(--primary); border-radius: 8px; box-shadow: 0 1px 4px rgba(5,21,55,0.04); }
+  .node-det-body .nrow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px dashed #EEF1F6; }
+  .node-det-body .nrow:last-of-type { border-bottom: none; }
+  .node-det-body .nrow .nlb { font-size: 14px; color: var(--t3); flex-shrink: 0; }
+  .node-det-body .nrow .nvl { font-size: 14px; color: var(--t1); font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
+  .node-det-body .nrow .nvl em { font-style: normal; font-weight: 600; }
+  .node-det-body .nrow .nvl.hl-g { color: #3E8A10; }
+  .node-det-body .nrow .nvl.hl-r { color: #DD473A; }
+  .node-det-body .nrow .nvl.hl-b { color: var(--primary); }
+  .node-det-body .nrow .nvl .st-tag { font-size: 12px; }
+  .node-det-body .nd-note { font-size: 12px; color: var(--t3); line-height: 19px; margin-top: 8px; padding: 9px 11px; background: #F7F9FC; border-radius: 6px; }
+
+  /* 节点条补充分支 */
+  .node-row.gray { background: #F2F4F5; }
+  .node-row.gray .nd { background: #7484A5; }
+  .esc-row { display: flex; align-items: flex-start; gap: 6px; padding: 5px 8px; margin-top: 4px; background: #FEF0F0; border-radius: 6px; font-size: 12px; }
+  .esc-row svg { flex-shrink: 0; margin-top: 2px; }
+  .esc-row .ex { color: var(--error); line-height: 17px; }
+  .term-box { background: #F2F4F5; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--t2); line-height: 19px; }
+  .term-box b { color: var(--t1); font-weight: 600; }
+
+  /* 操作按钮（卡内多按钮） */
+  .card-foot { gap: 10px; align-items: center; }
+
+  /* ===== 卡片列表 ===== */
+  .card-list { padding: 12px 16px 4px; }
+  .card-list .card { display: none; background: #FFFFFF; border-radius: 12px; box-shadow: 0 2px 12px rgba(5,21,55,0.10); padding: 14px 16px 12px; margin-bottom: 12px; }
+  #tab-all:checked     ~ .app .card-list .card { display: block; }
+  #tab-doing:checked   ~ .app .card-list .st-doing { display: block; }
+  #tab-unfin:checked   ~ .app .card-list .st-unfin { display: block; }
+  #tab-overdue:checked ~ .app .card-list .st-overdue { display: block; }
+  #tab-done:checked    ~ .app .card-list .st-done { display: block; }
+
+  .card-head { display: flex; align-items: flex-start; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+  .card-head .c-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--t1); line-height: 20px; }
+  .card-body { padding: 8px 0 0; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 12px; }
+  .info-row .lb { color: var(--t3); flex-shrink: 0; }
+  .info-row .vl { color: var(--t2); text-align: right; font-variant-numeric: tabular-nums; }
+  .info-row .vl.amt { color: #D97706; font-weight: 600; }
+
+  /* 履约进度 */
+  .prog-row { display: flex; align-items: center; gap: 10px; padding: 6px 0 4px; }
+  .prog-row .lb { color: var(--t3); font-size: 12px; flex-shrink: 0; }
+  .prog { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .prog i { display: block; height: 100%; border-radius: 3px; background: var(--primary); }
+  .prog.done i { background: var(--success); }
+  .prog.work i { background: var(--success); }
+  .prog-num.work { color: var(--success); }
+  .prog-num { flex-shrink: 0; font-size: 12px; color: var(--primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .prog-num.done { color: var(--success); }
+
+  /* 履约类型徽标 */
+  .pt-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; }
+  .pt-row .lb { color: var(--t3); font-size: 12px; }
+  .pt-row .pts { display: flex; gap: 6px; }
+  .pt-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; line-height: 15px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+  .pt-fin { color: var(--primary); background: rgba(41,120,255,0.10); }
+  .pt-phy { color: #0CAE8A; background: rgba(12,174,138,0.10); }
+  .pt-oth { color: #722ED1; background: rgba(114,46,209,0.10); }
+
+  /* 最近节点 */
+  .node-row { display: flex; align-items: flex-start; gap: 6px; padding: 5px 8px; margin-top: 4px; background: #F7F9FC; border-radius: 6px; font-size: 12px; }
+  .node-row .nd { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-top: 5px; flex-shrink: 0; }
+  .node-row .nx { color: var(--t2); line-height: 17px; }
+  .node-row .nx b { color: var(--t1); font-weight: 600; }
+  .node-row.warn { background: #FDF6EC; }
+  .node-row.warn .nd { background: var(--warning); }
+  .node-row.danger { background: #FEF0F0; }
+  .node-row.danger .nd { background: var(--error); }
+  .node-row.danger .nx, .node-row.danger .nx b { color: var(--error); }
+
+  .card-foot { display: flex; justify-content: flex-end; padding-top: 12px; margin-top: 6px; border-top: 1px solid var(--line); }
+  .btn-detail { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 20px; border-radius: 18px; background: var(--primary); color: #FFFFFF; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px rgba(41,120,255,0.25); user-select: none; }
+  .btn-detail:active { background: var(--primary-deep); }
+
+  /* ===== 状态标签（实底色块 · 无圆点） ===== */
+  .st-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; line-height: 16px; font-weight: 500; color: #FFFFFF; flex-shrink: 0; }
+  .st-blue  { background: #2978FF; }
+  .st-green { background: #52C41A; }
+  .st-orange{ background: #FA8C16; }
+  .st-red   { background: #DD473A; }
+  .st-gray  { background: #7484A5; }
+
+  /* ===== 底部弹窗（checkbox hack） ===== */
+  .sheet-mask { display: none; position: fixed; inset: 0; z-index: 1000; }
+  .sheet-mask .mask-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.5); cursor: pointer; }
+  .bottom-sheet { position: absolute; left: 0; right: 0; bottom: 0; max-width: 375px; margin: 0 auto; background: #FFFFFF; border-radius: 16px 16px 0 0; max-height: 84vh; display: flex; flex-direction: column; animation: sheetUp .22s ease-out; }
+  @keyframes sheetUp { from { transform: translateY(30%); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+    #sheet-fc:checked ~ #mask-fc,
+  #sheet-filter:checked ~ #mask-filter,
+  #sheet-fatt:checked ~ #mask-fatt,
+  #sheet-d1:checked ~ #mask-d1,
+  #sheet-d2:checked ~ #mask-d2,
+  #sheet-d3:checked ~ #mask-d3,
+  #sheet-d4:checked ~ #mask-d4,
+  #sheet-d5:checked ~ #mask-d5,
+  #sheet-d6:checked ~ #mask-d6,
+  #sheet-d7:checked ~ #mask-d7 { display: block; }
+
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; flex-shrink: 0; }
+  .sheet-head .sh-title { font-size: 16px; font-weight: 600; color: var(--t1); }
+  .sheet-head .sh-close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: #F5F6F8; border-radius: 50%; cursor: pointer; }
+  .sheet-body { overflow-y: auto; padding: 0 16px 16px; }
+
+  /* 明细弹窗 · 合同概要 */
+  .d-sum { background: #F7F9FC; border-radius: 8px; padding: 12px; }
+  .d-sum .d-name { font-size: 14px; font-weight: 600; color: var(--t1); line-height: 19px; margin-bottom: 6px; }
+  .d-sum .info-row { padding: 3px 0; }
+  .d-sum .prog-row { padding: 6px 0 2px; }
+  .d-sep { height: 1px; background: var(--line); margin: 12px 0; }
+  .d-sec-title { font-size: 14px; font-weight: 600; color: var(--t1); padding-left: 8px; border-left: 3px solid var(--primary); line-height: 16px; margin-bottom: 10px; }
+
+  /* 履约任务时间轴 */
+  .tl { position: relative; padding-left: 4px; }
+  .tl-item { position: relative; padding: 0 0 14px 18px; }
+  .tl-item:last-child { padding-bottom: 2px; }
+  .tl-item::before { content: ""; position: absolute; left: 5px; top: 14px; bottom: -2px; width: 1px; background: var(--line); }
+  .tl-item:last-child::before { display: none; }
+  /* 连接线按节点状态着色（PRD 5.7 规则3） */
+  .tl-item.i-done::before { background: var(--success); }
+  .tl-item.i-doing::before { background: var(--primary); box-shadow: 0 0 4px rgba(41,120,255,0.35); }
+  .tl-item.i-warn::before { background: var(--warning); }
+  .tl-item.i-err::before { background: var(--error); }
+  .tl-dot { position: absolute; left: 0; top: 4px; width: 11px; height: 11px; border-radius: 50%; background: #FFFFFF; border: 2px solid #C9D4E5; }
+  .tl-item.i-done  .tl-dot { border-color: var(--success); background: var(--success); }
+  .tl-item.i-doing .tl-dot { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 3px rgba(41,120,255,0.15); }
+  .tl-item.i-warn  .tl-dot { border-color: var(--warning); background: #FFFFFF; }
+  .tl-item.i-err   .tl-dot { border-color: var(--error); background: var(--error); }
+  .tl-top { display: flex; align-items: center; gap: 6px; }
+  .tl-name { flex: 1; font-size: 14px; color: var(--t1); font-weight: 500; line-height: 18px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tl-date { font-size: 11px; color: var(--t3); margin-top: 3px; font-variant-numeric: tabular-nums; }
+
+
+  /* 完成确认 + 筛选弹窗样式（一期保留） */
+  .alert-warn { display: flex; gap: 8px; padding: 11px 13px; border-radius: 8px; background: #FDF6EC; border: 1px solid #F7E2C4; font-size: 12px; color: #96601E; line-height: 18px; }
+  .up-box { border: 1px dashed #B9CEEB; border-radius: 10px; background: #FAFCFF; padding: 20px 12px; text-align: center; cursor: pointer; }
+  .up-box .up-main { font-size: 14px; color: var(--primary); font-weight: 500; margin-top: 8px; }
+  .up-box .up-sub { font-size: 12px; color: var(--t4); margin-top: 4px; }
+  .up-tip { font-size: 11px; color: var(--t4); line-height: 17px; margin-top: 8px; }
+  .f-label { font-size: 14px; font-weight: 600; color: var(--t1); margin: 14px 0 8px; }
+  .f-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .f-chip { cursor: pointer; user-select: none; }
+  .f-chip input { display: none; }
+  .f-chip span { display: inline-block; padding: 5px 14px; border-radius: 8px; font-size: 12px; line-height: 16px; border: 1px solid var(--border); color: var(--t3); background: #FFFFFF; }
+  .f-chip input:checked + span { border-color: var(--primary); color: var(--primary); background: rgba(41,120,255,0.10); font-weight: 600; }
+  .f-date { display: flex; align-items: center; gap: 8px; }
+  .f-date input[type="date"] { flex: 1; height: 34px; border: 1px solid var(--border); border-radius: 6px; padding: 0 8px; font-size: 12px; color: var(--t1); background: #FFFFFF; outline: none; font-family: inherit; }
+  .f-date .rg { color: var(--t4); flex-shrink: 0; }
+  .sheet-foot { display: flex; gap: 12px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); flex-shrink: 0; }
+  .f-btn { flex: 1; height: 40px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; cursor: pointer; user-select: none; }
+  .f-btn.reset { background: #F2F3F5; color: #4E5969; border: none; }
+  .f-btn.ok { background: var(--primary); color: #FFFFFF; box-shadow: 0 2px 6px rgba(41,120,255,0.25); }
+  .search-bar .filter-btn { width: 32px; height: 32px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border: 1px solid var(--border); border-radius: 16px; cursor: pointer; user-select: none; }
+  .search-bar .filter-btn:active { background: rgba(41,120,255,0.06); border-color: var(--primary); }
+
+  /* 附件清单（查看） */
+  .att-list { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .att-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #FFFFFF; }
+  .att-item + .att-item { border-top: 1px solid var(--line); }
+  .att-item .att-name { flex: 1; font-size: 12px; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .att-item .att-size { font-size: 11px; color: var(--t4); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .att-item .att-view { font-size: 12px; color: var(--primary); flex-shrink: 0; cursor: pointer; user-select: none; }
+</style>
+</head>
+<body>
+
+<!-- 视图切换 radio -->
+<input type="radio" name="perf-view" id="view-task" checked>
+<input type="radio" name="perf-view" id="view-contract">
+
+<!-- 任务状态过滤 radio（纯CSS过滤） -->
+<input type="radio" name="perf-ttab" id="t-all" checked>
+<input type="radio" name="perf-ttab" id="t-doing">
+<input type="radio" name="perf-ttab" id="t-unfin">
+<input type="radio" name="perf-ttab" id="t-overdue">
+<input type="radio" name="perf-ttab" id="t-term">
+<input type="radio" name="perf-ttab" id="t-done">
+
+<!-- 跟进记录弹窗开关 -->
+
+<!-- 状态过滤 radio（纯CSS列表过滤） -->
+<input type="radio" name="perf-tab" id="tab-all" checked>
+<input type="radio" name="perf-tab" id="tab-doing">
+<input type="radio" name="perf-tab" id="tab-unfin">
+<input type="radio" name="perf-tab" id="tab-overdue">
+<input type="radio" name="perf-tab" id="tab-done">
+
+<!-- 弹窗开关 -->
+<input type="checkbox" id="sheet-d1" class="sheet-toggle">
+<input type="checkbox" id="sheet-d2" class="sheet-toggle">
+<input type="checkbox" id="sheet-d3" class="sheet-toggle">
+<input type="checkbox" id="sheet-d4" class="sheet-toggle">
+<input type="checkbox" id="sheet-d5" class="sheet-toggle">
+<input type="checkbox" id="sheet-d6" class="sheet-toggle">
+<input type="checkbox" id="sheet-d7" class="sheet-toggle">
+<input type="checkbox" id="sheet-fc" class="sheet-toggle">
+<input type="checkbox" id="sheet-filter" class="sheet-toggle">
+<input type="checkbox" id="sheet-fatt" class="sheet-toggle">
+<div class="app">
+
+  <!-- 导航栏 -->
+  <header class="nav">
+    <a class="back" href="workbench.html" aria-label="返回工作台" style="text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#051537" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </a>
+    <span class="title">合同履约</span>
+    <div class="actions">
+      <span class="icon-btn" aria-label="更多">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#051537"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+      </span>
+    </div>
+  </header>
+
+  <!-- 搜索 + 筛选 -->
+  <div class="search-bar">
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9BA1AF" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" placeholder="请输入合同编号/名称/履约任务查询">
+    </div>
+    <label class="filter-btn" for="sheet-filter" aria-label="筛选">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#465065" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8.5V19l-4 2v-7.5L3 5z"/></svg>
+    </label>
+  </div>
+
+  <!-- 视图页签：履约任务 | 合同进度 -->
+  <div class="seg">
+    <label class="sg sg-task" for="view-task">按任务查询</label>
+    <label class="sg sg-con" for="view-contract">按合同查询</label>
+  </div>
+
+  <!-- 视图一：履约任务（履约负责人作业视角） -->
+  <div class="view-task-wrap">
+    <nav class="ttag-bar">
+      <label class="ttag tt-all" for="t-all">全部 8</label>
+      <label class="ttag tt-unfin" for="t-unfin">未开始 1</label>
+      <label class="ttag tt-doing" for="t-doing">进行中 2</label>
+      <label class="ttag tt-overdue" for="t-overdue">已超期 1</label>
+      <label class="ttag tt-done" for="t-done">已完成 3</label>
+      <label class="ttag tt-term" for="t-term">已终止 1</label>
+    </nav>
+    <section class="task-list">
+    <div class="tcard t-overdue">
+      <div class="card-head">
+        <span class="c-name">8月对账单确认</span>
+        <span class="st-tag st-red">已超期</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">电力物资年度框架合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001050320260015</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-dep">其他</span></span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">陈敏（CHENMIN）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">南方贸易-市场部-合同科</span></div>
+        <div class="info-row"><span class="lb">履约到期时间</span><span class="vl">2026-08-31</span></div>
+        <div class="esc-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DD473A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span class="ex">逾期 21 天 · 升级通知已送达分管领导</span></div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-fc">完成</label></div>
+      </div>
+    </div>
+    <div class="tcard t-doing">
+      <div class="card-head">
+        <span class="c-name">第一批熟料发运</span>
+        <span class="st-tag st-blue">进行中</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">海螺水泥熟料销售合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010220260012</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">提供货物或劳务</span></span></div>
+        <div class="info-row"><span class="lb">数据来源</span><span class="vl">云销系统（自动回写）</span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">刘洋（LIUYANG）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">南方贸易-市场部-合同科</span></div>
+        <div class="info-row"><span class="lb">履约到期时间</span><span class="vl">2026-09-25</span></div>
+        <div class="node-row"><i class="nd"></i><span class="nx">还剩 <b class="num-g">4 天</b> · 发运计划已排定，预计 09-25 装船</span></div>
+      </div>
+    </div>
+    <div class="tcard t-doing">
+      <div class="card-head">
+        <span class="c-name">第二批设备到货验收</span>
+        <span class="st-tag st-blue">进行中</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">矿山设备采购合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">吴斌（WUBIN）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">装备公司-采购部-设备科</span></div>
+        <div class="info-row"><span class="lb">履约到期时间</span><span class="vl">2026-09-28</span></div>
+        <div class="node-row"><i class="nd"></i><span class="nx">还剩 <b class="num-g">7 天</b> · 设备在途，待到货验收</span></div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-fc">完成</label></div>
+      </div>
+    </div>
+    <div class="tcard t-unfin">
+      <div class="card-head">
+        <span class="c-name">第三批备件到货</span>
+        <span class="st-tag st-gray">未开始</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">备品备件供货合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001030220260021</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">周涛（ZHOUTAO）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">赵磊（ZHAOLEI）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">装备公司-采购部-备件科</span></div>
+        <div class="info-row"><span class="lb">履约到期时间</span><span class="vl">2026-09-30</span></div>
+        <div class="node-row warn"><i class="nd"></i><span class="nx">还剩 <b class="num-g">9 天</b> · 供应商备货中，预计 09-28 发货</span></div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-fc">完成</label></div>
+      </div>
+    </div>
+    <div class="tcard t-term">
+      <div class="card-head">
+        <span class="c-name">尾批设备安装验收</span>
+        <span class="st-tag st-red">已终止</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">矿山设备采购合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">吴斌（WUBIN）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">装备公司-采购部-设备科</span></div>
+        <div class="info-row"><span class="lb">履约到期时间</span><span class="vl">原计划 2026-11-15</span></div>
+        <div class="node-row gray"><i class="nd"></i><span class="nx">因合同变更终止 · 2026-09-05 · <b>王强（WANGQIANG）</b></span></div>
+      </div>
+    </div>
+    <div class="tcard t-done">
+      <div class="card-head">
+        <span class="c-name">首期货款回收</span>
+        <span class="st-tag st-green">已完成</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">钢材购销合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010120260027</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">应收账款</span></span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">郑洁（ZHENGJIE）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">南方贸易-市场部-合同科</span></div>
+        <div class="info-row"><span class="lb">履约完成时间</span><span class="vl">2026-08-30</span></div>
+        <div class="info-row"><span class="lb">数据来源</span><span class="vl">财务系统（系统完成）</span></div>
+        <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">回款到账 · 2026-08-30</span></div>
+      <div class="card-foot"><label class="btn-ghost-sm" for="sheet-fatt">附件</label></div>
+      </div>
+    </div>
+    <div class="tcard t-done">
+      <div class="card-head">
+        <span class="c-name">末期运费结算</span>
+        <span class="st-tag st-green">已完成</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">熟料水路运输合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001040120250033</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">应付账款</span></span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">孙浩（SUNHAO）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">孙浩（SUNHAO）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">港务公司-运输部-调度科</span></div>
+        <div class="info-row"><span class="lb">履约完成时间</span><span class="vl">2026-08-31</span></div>
+        <div class="info-row"><span class="lb">数据来源</span><span class="vl">招采系统</span></div>
+        <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">结算完成 · 2026-08-31</span></div>
+      <div class="card-foot"><label class="btn-ghost-sm" for="sheet-fatt">附件</label></div>
+      </div>
+    </div>
+    <div class="tcard t-done">
+      <div class="card-head">
+        <span class="c-name">输送带安装调试</span>
+        <span class="st-tag st-green">已完成</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl">输送带采购合同</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020220250041</span></div>
+        <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
+        <div class="info-row"><span class="lb">履约负责人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">经办人部门</span><span class="vl">装备公司-采购部-设备科</span></div>
+        <div class="info-row"><span class="lb">履约完成时间</span><span class="vl">2026-06-28</span></div>
+        <div class="info-row"><span class="lb">数据来源</span><span class="vl">云销系统</span></div>
+        <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">验收通过 · 2026-06-28</span></div>
+      <div class="card-foot"><label class="btn-ghost-sm" for="sheet-fatt">附件</label></div>
+      </div>
+    </div>
+    </section>
+  </div>
+
+  <div class="view-contract-wrap">
+  <!-- 履约状态 Tab -->
+  <nav class="tag-bar">
+    <label class="tag tg-all" for="tab-all">全部 7</label>
+    <label class="tag tg-doing" for="tab-doing">进行中 3</label>
+    <label class="tag tg-unfin" for="tab-unfin">未开始 1</label>
+    <label class="tag tg-overdue" for="tab-overdue">已超期 1</label>
+    <label class="tag tg-done" for="tab-done">已完成 2</label>
+  </nav>
+
+  <!-- 卡片列表 -->
+  <section class="card-list">
+
+    <!-- 卡1 进行中 -->
+    <div class="card st-doing">
+      <div class="card-head">
+        <span class="c-name">海螺水泥熟料销售合同</span>
+        <span class="st-tag st-blue">进行中</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010220260012</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">12,800,000.00 CNY</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-05-01 ~ 2026-11-30</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 9 · <span class="num-g">已完成 6</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:44%"></i></span><span class="prog-num">44%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:67%"></i></span><span class="prog-num work">67%</span></div>
+        <div class="node-row"><i class="nd"></i><span class="nx">下一节点：<b>第四批熟料发运 · 2026-09-25</b></span></div>
+      </div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-d1">履约记录</label></div>
+    </div>
+
+    <!-- 卡2 进行中 -->
+    <div class="card st-doing">
+      <div class="card-head">
+        <span class="c-name">矿山设备采购合同</span>
+        <span class="st-tag st-blue">进行中</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">3,560,000.00 CNY</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-06-10 ~ 2026-12-20</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 6 · <span class="num-g">已完成 2</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:30%"></i></span><span class="prog-num">30%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:33%"></i></span><span class="prog-num work">33%</span></div>
+        <div class="node-row"><i class="nd"></i><span class="nx">下一节点：<b>第二批设备到货验收 · 2026-09-28</b></span></div>
+      </div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-d2">履约记录</label></div>
+    </div>
+
+    <!-- 卡3 已超期 -->
+    <div class="card st-overdue">
+      <div class="card-head">
+        <span class="c-name">电力物资年度框架合同</span>
+        <span class="st-tag st-red">已超期</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001050320260015</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">486,000.00 CNY</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">陈敏（CHENMIN）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-01-01 ~ 2026-12-31</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 8 · <span class="num-g">已完成 6</span> · <span class="num-r">逾期 1</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:63%"></i></span><span class="prog-num">63%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:75%"></i></span><span class="prog-num work">75%</span></div>
+        <div class="node-row danger"><i class="nd"></i><span class="nx">逾期任务：<b>8月对账单确认 · 2026-08-31</b></span></div>
+      </div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-d3">履约记录</label></div>
+    </div>
+
+    <!-- 卡4 未开始 -->
+    <div class="card st-unfin">
+      <div class="card-head">
+        <span class="c-name">备品备件供货合同</span>
+        <span class="st-tag st-gray">未开始</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001030220260021</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">1,260,000.00 CNY</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">赵磊（ZHAOLEI）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-07-01 ~ 2026-10-31</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 5 · <span class="num-g">已完成 3</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:60%"></i></span><span class="prog-num">60%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:60%"></i></span><span class="prog-num work">60%</span></div>
+        <div class="node-row warn"><i class="nd"></i><span class="nx">未开始节点：<b>第三批备件到货 · 2026-09-30</b></span></div>
+      </div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-d4">履约记录</label></div>
+    </div>
+
+    <!-- 卡5 已完成 -->
+    <div class="card st-done">
+      <div class="card-head">
+        <span class="c-name">熟料水路运输合同</span>
+        <span class="st-tag st-green">已完成</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001040120250033</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">8,920,000.00 CNY</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">孙浩（SUNHAO）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-11-01 ~ 2026-08-31</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 6 · <span class="num-g">已完成 6</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:100%"></i></span><span class="prog-num">100%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:100%"></i></span><span class="prog-num work">100%</span></div>
+        <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">最后节点：<b>末期运费结算 · 2026-08-31 已完成</b></span></div>
+      </div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-d5">履约记录</label></div>
+    </div>
+
+    <!-- 卡6 进行中 -->
+    <div class="card st-doing">
+      <div class="card-head">
+        <span class="c-name">钢材购销合同</span>
+        <span class="st-tag st-blue">进行中</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010120260027</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">2,340,000.00 CNY</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-08-01 ~ 2027-02-28</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 4 · <span class="num-g">已完成 1</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:40%"></i></span><span class="prog-num">40%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:25%"></i></span><span class="prog-num work">25%</span></div>
+        <div class="node-row"><i class="nd"></i><span class="nx">下一节点：<b>第二期货款回收 · 2026-10-10</b></span></div>
+      </div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-d6">履约记录</label></div>
+    </div>
+
+    <!-- 卡7 已完成 -->
+    <div class="card st-done">
+      <div class="card-head">
+        <span class="c-name">输送带采购合同</span>
+        <span class="st-tag st-green">已完成</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020220250041</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">658,000.00 CNY</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-09-01 ~ 2026-06-30</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 3 · <span class="num-g">已完成 3</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:100%"></i></span><span class="prog-num">100%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:100%"></i></span><span class="prog-num work">100%</span></div>
+        <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">最后节点：<b>安装调试验收 · 2026-06-28 已完成</b></span></div>
+      </div>
+      <div class="card-foot"><label class="btn-detail" for="sheet-d7">履约记录</label></div>
+    </div>
+
+  </section>
+  </div>
+</div>
+
+
+<!-- 明细弹窗 D1 -->
+<div class="sheet-mask" id="mask-d1">
+  <label class="mask-bg" for="sheet-d1"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约记录</span>
+      <label class="sh-close" for="sheet-d1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    </div>
+    <div class="sheet-body">
+      <div class="d-sum">
+        <div class="d-name">海螺水泥熟料销售合同 <span class="st-tag st-blue" style="margin-left:6px;">进行中</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010220260012</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">12,800,000.00 元</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-05-01 ~ 2026-11-30</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 9 · <span class="num-g">已完成 6</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:44%"></i></span><span class="prog-num">44%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:67%"></i></span><span class="prog-num work">67%</span></div>
+      </div>
+      <div class="d-sep"></div>
+      <div class="d-sec-title">履约节点</div>
+      <div class="tl">
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">尾批交付与结算</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-11-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-11-30</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">第四期货款回收</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-10-15</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-10-15</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-doing"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">提供货物或劳务</span><span class="tl-name">第四批熟料发运</span><span class="st-tag st-blue">进行中</span></div><div class="tl-date">计划完成 2026-09-25</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-09-25</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+            <div class="nd-note">该节点正在履约推进中，可由履约负责人继续跟进或确认完成。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">第三期货款回收 25%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-05</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-05</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">提供货物或劳务</span><span class="tl-name">第三批熟料发运</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-15</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-15</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">第二期货款回收 30%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-28</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-28</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">提供货物或劳务</span><span class="tl-name">第二批熟料发运</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-18</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-18</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">首期货款回收 30%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-30</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">提供货物或劳务</span><span class="tl-name">第一批熟料发运</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-20</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-20</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 明细弹窗 D2 -->
+<div class="sheet-mask" id="mask-d2">
+  <label class="mask-bg" for="sheet-d2"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约记录</span>
+      <label class="sh-close" for="sheet-d2">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    </div>
+    <div class="sheet-body">
+      <div class="d-sum">
+        <div class="d-name">矿山设备采购合同 <span class="st-tag st-blue" style="margin-left:6px;">进行中</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">3,560,000.00 元</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-06-10 ~ 2026-12-20</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 6 · <span class="num-g">已完成 2</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:30%"></i></span><span class="prog-num">30%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:33%"></i></span><span class="prog-num work">33%</span></div>
+      </div>
+      <div class="d-sep"></div>
+      <div class="d-sec-title">履约节点</div>
+      <div class="tl">
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">应付账款</span><span class="tl-name">终验收与质保金</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-12-15</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-12-15</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">吴斌（WUBIN）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">到货款支付 40%</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-10-20</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-10-20</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">吴斌（WUBIN）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-doing"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">第二批设备到货验收</span><span class="st-tag st-blue">进行中</span></div><div class="tl-date">计划完成 2026-09-28</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-09-28</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">吴斌（WUBIN）</span></div>
+            <div class="nd-note">该节点正在履约推进中，可由履约负责人继续跟进或确认完成。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">首批设备安装调试</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-22</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-22</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">吴斌（WUBIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">首批设备到货</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-30</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">吴斌（WUBIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">预付款支付 30%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-20</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-20</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">吴斌（WUBIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 明细弹窗 D3 -->
+<div class="sheet-mask" id="mask-d3">
+  <label class="mask-bg" for="sheet-d3"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约记录</span>
+      <label class="sh-close" for="sheet-d3">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    </div>
+    <div class="sheet-body">
+      <div class="d-sum">
+        <div class="d-name">电力物资年度框架合同 <span class="st-tag st-red" style="margin-left:6px;">已超期</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001050320260015</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">486,000.00 元</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">陈敏（CHENMIN）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-01-01 ~ 2026-12-31</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 8 · <span class="num-g">已完成 6</span> · <span class="num-r">逾期 1</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:63%"></i></span><span class="prog-num">63%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:75%"></i></span><span class="prog-num work">75%</span></div>
+      </div>
+      <div class="d-sep"></div>
+      <div class="d-sec-title">履约节点</div>
+      <div class="tl">
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">发票开具</span><span class="tl-name">三季度发票开具</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-10-10</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-10-10</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">陈敏（CHENMIN）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-err"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">8月对账单确认</span><span class="st-tag st-red">已超期</span></div><div class="tl-date">计划完成 2026-08-31</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-08-31</span></div>
+          <div class="nrow"><span class="nlb">已超期天数</span><span class="nvl hl-r">21 天</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">履约负责人（超期未完成）</span></div>
+          <div class="nrow"><span class="nlb">升级通知</span><span class="nvl hl-r">已送达分管领导</span></div>
+            <div class="nd-note">该节点已超期，已按预期通知机制逐级升级。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">发票开具</span><span class="tl-name">上半年发票开具</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-10</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-10</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">7月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-31</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-31</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">6月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-30</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">5月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-31</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-31</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">4月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-04-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-04-30</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">一季度对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-03-31</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-03-31</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 明细弹窗 D4 -->
+<div class="sheet-mask" id="mask-d4">
+  <label class="mask-bg" for="sheet-d4"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约记录</span>
+      <label class="sh-close" for="sheet-d4">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    </div>
+    <div class="sheet-body">
+      <div class="d-sum">
+        <div class="d-name">备品备件供货合同 <span class="st-tag st-gray" style="margin-left:6px;">未开始</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001030220260021</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">1,260,000.00 元</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">赵磊（ZHAOLEI）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-07-01 ~ 2026-10-31</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 5 · <span class="num-g">已完成 3</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:60%"></i></span><span class="prog-num">60%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:60%"></i></span><span class="prog-num work">60%</span></div>
+      </div>
+      <div class="d-sep"></div>
+      <div class="d-sec-title">履约节点</div>
+      <div class="tl">
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">尾款支付 60%</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-10-20</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-10-20</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-warn"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">第三批备件到货</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-09-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-09-30</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">第二批备件到货</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-18</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-18</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">首批货款支付 40%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-25</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-25</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">第一批备件到货</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-20</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-20</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 明细弹窗 D5 -->
+<div class="sheet-mask" id="mask-d5">
+  <label class="mask-bg" for="sheet-d5"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约记录</span>
+      <label class="sh-close" for="sheet-d5">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    </div>
+    <div class="sheet-body">
+      <div class="d-sum">
+        <div class="d-name">熟料水路运输合同 <span class="st-tag st-green" style="margin-left:6px;">已完成</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001040120250033</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">8,920,000.00 元</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">孙浩（SUNHAO）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-11-01 ~ 2026-08-31</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 6 · <span class="num-g">已完成 6</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:100%"></i></span><span class="prog-num">100%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:100%"></i></span><span class="prog-num work">100%</span></div>
+      </div>
+      <div class="d-sep"></div>
+      <div class="d-sec-title">履约节点</div>
+      <div class="tl">
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">末期运费结算</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-31</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-31</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">三季度运输计划执行</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-25</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-25</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">二季度运费结算</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-12</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-12</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">二季度运输计划执行</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-04-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-04-30</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">一季度运费结算</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-02-10</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-02-10</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">一季度运输计划执行</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-01-31</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-01-31</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 明细弹窗 D6 -->
+<div class="sheet-mask" id="mask-d6">
+  <label class="mask-bg" for="sheet-d6"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约记录</span>
+      <label class="sh-close" for="sheet-d6">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    </div>
+    <div class="sheet-body">
+      <div class="d-sum">
+        <div class="d-name">钢材购销合同 <span class="st-tag st-blue" style="margin-left:6px;">进行中</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010120260027</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">2,340,000.00 元</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-08-01 ~ 2027-02-28</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 4 · <span class="num-g">已完成 1</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:40%"></i></span><span class="prog-num">40%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:25%"></i></span><span class="prog-num work">25%</span></div>
+      </div>
+      <div class="d-sep"></div>
+      <div class="d-sec-title">履约节点</div>
+      <div class="tl">
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">应收账款</span><span class="tl-name">质保金回收 10%</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2027-02-20</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2027-02-20</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">郑洁（ZHENGJIE）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">第三期货款回收 20%</span><span class="st-tag st-gray">未开始</span></div><div class="tl-date">计划完成 2026-12-10</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-12-10</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">郑洁（ZHENGJIE）</span></div>
+          <div class="nrow"><span class="nlb">前置节点</span><span class="nvl">上序节点完成后启动</span></div>
+            <div class="nd-note">该节点尚未开始，待前置节点完成后启动履约。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-doing"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">第二期货款回收 30%</span><span class="st-tag st-blue">进行中</span></div><div class="tl-date">计划完成 2026-10-10</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">计划完成时间</span><span class="nvl">2026-10-10</span></div>
+          <div class="nrow"><span class="nlb">履约负责人</span><span class="nvl">郑洁（ZHENGJIE）</span></div>
+            <div class="nd-note">该节点正在履约推进中，可由履约负责人继续跟进或确认完成。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">首期货款回收 40%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-30</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-30</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">郑洁（ZHENGJIE）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 明细弹窗 D7 -->
+<div class="sheet-mask" id="mask-d7">
+  <label class="mask-bg" for="sheet-d7"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约记录</span>
+      <label class="sh-close" for="sheet-d7">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    </div>
+    <div class="sheet-body">
+      <div class="d-sum">
+        <div class="d-name">输送带采购合同 <span class="st-tag st-green" style="margin-left:6px;">已完成</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020220250041</span></div>
+        <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">658,000.00 元</span></div>
+        <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
+        <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-09-01 ~ 2026-06-30</span></div>
+        <div class="info-row"><span class="lb">节点统计</span><span class="vl">总数 3 · <span class="num-g">已完成 3</span> · <span class="num-r">逾期 0</span></span></div>
+        <div class="prog-row"><span class="lb">资金进度</span><span class="prog"><i style="width:100%"></i></span><span class="prog-num">100%</span></div>
+        <div class="prog-row"><span class="lb">工作进度</span><span class="prog work"><i style="width:100%"></i></span><span class="prog-num work">100%</span></div>
+      </div>
+      <div class="d-sep"></div>
+      <div class="d-sec-title">履约节点</div>
+      <div class="tl">
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">安装调试验收</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-28</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-28</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">王强（WANGQIANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">安装调试完成</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2025-12-20</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2025-12-20</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">王强（WANGQIANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+        <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">输送带到货</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2025-10-15</div>
+        <details class="node-det">
+          <summary><svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="node-det-body">
+          <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2025-10-15</span></div>
+          <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
+          <div class="nrow"><span class="nlb">完成人</span><span class="nvl">王强（WANGQIANG）</span></div>
+            <div class="nd-note">该节点已履约完成，完成时间与数据来源由系统留痕。</div>
+          </div>
+        </details></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 附件查看弹窗 FATT（已完成任务：履约计划附件只读查看） -->
+<div class="sheet-mask" id="mask-fatt">
+  <label class="mask-bg" for="sheet-fatt"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">履约计划附件</span>
+      <label class="sh-close" for="sheet-fatt"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></label>
+    </div>
+    <div class="sheet-body">
+      <div class="att-list">
+        <div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">发货签收单.pdf</span><span class="att-size">1.2MB</span><span class="att-view">查看</span></div>
+        <div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">过磅单.jpg</span><span class="att-size">860KB</span><span class="att-view">查看</span></div>
+        <div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">结算确认单.docx</span><span class="att-size">342KB</span><span class="att-view">查看</span></div>
+      </div>
+      <div class="up-tip">附件来源于 Web 端履约计划维护，移动端只读查看；如需上传或替换请到 PC 端操作。</div>
+    </div>
+  </div>
+</div>
+
+<!-- 完成确认弹窗 FC（仅手动可完成任务展示入口） -->
+<div class="sheet-mask" id="mask-fc">
+  <label class="mask-bg" for="sheet-fc"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">完成确认</span>
+      <label class="sh-close" for="sheet-fc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></label>
+    </div>
+    <div class="sheet-body">
+      <div class="alert-warn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E08A1E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.2v.1"/></svg>
+        <span>您正在进行履约任务的完成确认。若需上传附件，请点击下方区域上传；无需上传附件，直接点击「确定」即可。</span>
+      </div>
+      <div class="f-label">履约计划附件</div>
+      <div class="att-list">
+        <div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">发货签收单.pdf</span><span class="att-size">1.2MB</span><span class="att-view">查看</span></div>
+        <div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">过磅单.jpg</span><span class="att-size">860KB</span><span class="att-view">查看</span></div>
+      </div>
+      <div class="f-label">上传附件</div>
+      <div class="up-box">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5"/><path d="M8 9l4-4 4 4"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16"/></svg>
+        <div class="up-main">点击选择文件上传</div>
+        <div class="up-sub">支持拖拽文件至此</div>
+      </div>
+      <div class="up-tip">只能上传 word / jpg / png / PDF 文件，且单个文件大小不超过 50M，最多 10 个</div>
+    </div>
+    <div class="sheet-foot">
+      <label class="f-btn reset" for="sheet-fc">取消</label>
+      <label class="f-btn ok" for="sheet-fc">确认完成</label>
+    </div>
+  </div>
+</div>
+
+<!-- 筛选弹窗 -->
+<div class="sheet-mask" id="mask-filter">
+  <label class="mask-bg" for="sheet-filter"></label>
+  <div class="bottom-sheet">
+    <div class="sheet-head">
+      <span class="sh-title">筛选</span>
+      <label class="sh-close" for="sheet-filter"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7484A5" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></label>
+    </div>
+    <div class="sheet-body">
+      <div class="f-label">履约类型</div>
+      <div class="f-chips">
+        <label class="f-chip"><input type="checkbox" checked><span>应付账款</span></label>
+        <label class="f-chip"><input type="checkbox" checked><span>应收账款</span></label>
+        <label class="f-chip"><input type="checkbox" checked><span>接受货物或服务</span></label>
+        <label class="f-chip"><input type="checkbox" checked><span>提供货物或劳务</span></label>
+        <label class="f-chip"><input type="checkbox" checked><span>发票开具</span></label>
+        <label class="f-chip"><input type="checkbox" checked><span>其他</span></label>
+      </div>
+      <div class="f-label">履约时间范围</div>
+      <div class="f-chips" style="margin-bottom:10px;">
+        <label class="f-chip"><input type="radio" name="f-range" checked><span>近一个月</span></label>
+        <label class="f-chip"><input type="radio" name="f-range"><span>近三个月</span></label>
+        <label class="f-chip"><input type="radio" name="f-range"><span>自定义</span></label>
+      </div>
+      <div class="f-date">
+        <input type="date" value="2026-09-10">
+        <span class="rg">至</span>
+        <input type="date" value="2026-10-10">
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <label class="f-btn reset" for="sheet-filter">重置</label>
+      <label class="f-btn ok" for="sheet-filter">确定</label>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PRD悬浮查看 - xxgs-html-prd v2.1.0 CSS-only 适配版（WorkBuddy 预览禁 JS 兼容；数据源：合同履约-移动端-PRD-V1.0.md V1.2，原文未增删改） ========== -->
+<style>
+#prd-open { display: none; }
+#prdFloatBtn { position: fixed; top: 50%; right: max(12px, calc(50% - 176px)); transform: translateY(-50%); width: 48px; height: 48px; background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%); border-radius: 50%; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4); z-index: 9998; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+#prdFloatBtn svg { width: 24px; height: 24px; fill: #fff; }
+#prdDocPanel { position: fixed; top: 0; right: 0; width: 420px; max-width: calc(100vw - 24px); height: 100vh; background: #FFFFFF; box-shadow: -8px 0 32px rgba(0,0,0,0.12); z-index: 10000; transform: translateX(105%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
+#prd-open:checked ~ #prdDocPanel { transform: translateX(0); }
+#prdOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s; cursor: pointer; }
+#prd-open:checked ~ #prdOverlay { opacity: 1; pointer-events: auto; }
+.prd-panel-header { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; background: #fafafa; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.prd-panel-header h3 { flex: 1; margin: 0; font-size: 16px; font-weight: 600; color: #1a1a1a; }
+.prd-panel-close { width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #666; }
+.prd-panel-close:hover { background: #f0f0f0; }
+.prd-toc { padding: 12px 20px; border-bottom: 1px solid #f0f0f0; background: #fafafa; overflow-x: auto; flex-shrink: 0; }
+.prd-toc-link { display: inline-block; padding: 6px 14px; font-size: 12px; color: #666; text-decoration: none; border-radius: 4px; white-space: nowrap; }
+.prd-toc-link:hover { background: #e6f0ff; color: #2563EB; }
+.prd-doc-content { flex: 1; overflow-y: auto; padding: 24px 20px; }
+.prd-chapter { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px dashed #f0f0f0; }
+.prd-chapter h2 { font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 2px solid #2563EB; }
+.prd-chapter h3 { font-size: 14px; font-weight: 600; color: #333; margin: 16px 0 10px; }
+.prd-chapter p { font-size: 12px; color: #555; line-height: 1.8; margin: 0 0 10px; }
+.prd-chapter ul, .prd-chapter ol { margin: 10px 0; padding-left: 22px; }
+.prd-chapter li { font-size: 12px; color: #555; line-height: 1.7; margin-bottom: 6px; }
+.prd-chapter table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+.prd-chapter table th, .prd-chapter table td { padding: 10px 12px; border: 1px solid #e8e8e8; text-align: left; vertical-align: top; }
+.prd-chapter table th { background: #f5f7fa; font-weight: 600; color: #333; }
+.prd-chapter table tr:nth-child(even) { background: #fafafa; }
+</style>
+
+<input type="checkbox" id="prd-open">
+<label id="prdFloatBtn" for="prd-open" title="点击查看PRD文档">
+  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/></svg>
+</label>
+<label id="prdOverlay" for="prd-open"></label>
+<div id="prdDocPanel">
+  <div class="prd-panel-header">
+    <h3>PRD文档 · 合同履约（移动端）V1.2</h3>
+    <label class="prd-panel-close" for="prd-open" title="关闭"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></label>
+  </div>
+  <div class="prd-toc"><a class="prd-toc-link" href="#prd-ch0">文档信息</a><a class="prd-toc-link" href="#prd-ch1">修订记录</a><a class="prd-toc-link" href="#prd-ch2">一、需求背景</a><a class="prd-toc-link" href="#prd-ch3">二、需求目标</a><a class="prd-toc-link" href="#prd-ch4">三、用户角色与权限</a><a class="prd-toc-link" href="#prd-ch5">四、名词解释</a><a class="prd-toc-link" href="#prd-ch6">五、功能详细需求</a><a class="prd-toc-link" href="#prd-ch7">六、非功能需求</a><a class="prd-toc-link" href="#prd-ch8">七、评审结论与关联规划</a></div>
+  <div class="prd-doc-content">
+<section class="prd-chapter" id="prd-ch0"><h2>文档信息</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>系统名称</td>
+<td>合同管理系统</td>
+</tr>
+<tr>
+<td>模块名称</td>
+<td>合同履约（移动端查询组件）</td>
+</tr>
+<tr>
+<td>文档版本</td>
+<td>V1.3（草稿）</td>
+</tr>
+<tr>
+<td>产品经理</td>
+<td>白林高</td>
+</tr>
+<tr>
+<td>创建日期</td>
+<td>2026-09-21</td>
+</tr>
+<tr>
+<td>最后更新日期</td>
+<td>2026-10-09</td>
+</tr>
+<tr>
+<td>优先级</td>
+<td>P1（高）</td>
+</tr>
+<tr>
+<td>原型文件</td>
+<td>合同履约-H5查询组件.html（已评审五轮）</td>
+</tr>
+</tbody>
+</table></section>
+<section class="prd-chapter" id="prd-ch1"><h2>修订记录</h2>
+<table>
+<thead>
+<tr>
+<th>版本号</th>
+<th>修订日期</th>
+<th>修订类型</th>
+<th>修订内容摘要</th>
+<th>修订人</th>
+<th>审核人</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V1.0</td>
+<td>2026-09-21</td>
+<td>新建</td>
+<td>初始版本，基于H5原型五轮评审沉淀输出</td>
+<td>白林高</td>
+<td>待定</td>
+</tr>
+<tr>
+<td>V1.0</td>
+<td>2026-09-21</td>
+<td>修订</td>
+<td>待确认事项①~⑤评审结论落稿；新增Web端跟进明细弹窗关联规划</td>
+<td>白林高</td>
+<td>待定</td>
+</tr>
+<tr>
+<td>V1.0</td>
+<td>2026-09-23</td>
+<td>修订</td>
+<td>按Web端源码校准：履约类型改六类枚举、数据来源改外部系统、新增资金进度、完成动作改附件上传、字段名与文案对齐</td>
+<td>白林高</td>
+<td>待定</td>
+</tr>
+</tbody>
+</table></section>
+<section class="prd-chapter" id="prd-ch2"><h2>一、需求背景</h2>
+<p>当前合同履约管理仅在PC端（Web端"合同履约-任务管理"）支撑，移动端无法查看合同履约情况与履约进度。履约负责人外出、现场等场景下无法及时掌握所负责履约任务的到期时间与执行进展，跟进记录依赖回到PC端补录，时效性差；合同经办人、经办负责人及分管领导在移动端无法掌握合同维度履约进度与逾期升级情况，逾期风险传递滞后。</p>
+<p>为此，需在合同管理系统移动端（H5）增加合同履约查询组件，与Web端数据同源、字段对齐、状态体系一致，支持按任务、按合同双视角查询，并提供跟进记录、手动确认完成两项轻量操作。</p>
+<p>上下游关系：上游为Web端合同履约管理（履约计划维护与任务生成）及业务系统（财务对账、结算等，负责自动完成回写）；下游为消息中心（逾期升级通知触达）与合同归档库（合同文本附件来源）。</p></section>
+<section class="prd-chapter" id="prd-ch3"><h2>二、需求目标</h2>
+<ol>
+<li>履约任务随身可查：移动端按任务、按合同双视角展示履约数据，状态、到期时间、剩余天数、节点进度一目了然；</li>
+<li>轻量操作闭环：手动可完成的履约任务支持在移动端确认完成并上传附件；系统回写任务自动完成并明示数据来源，避免用户困惑；</li>
+<li>完成来源双通道留痕：系统同步（业务系统回写）与手动确认（移动端操作）均记录完成时间与数据来源，全程可追溯；</li>
+<li>逾期升级移动可见：超期任务在移动端透明呈现升级链路与通知送达层级，支撑经办负责人、分管领导及时知悉；</li>
+<li>端端一致：移动端与Web端字段命名、状态分类、履约类型完全对齐，降低用户跨端认知成本。</li>
+</ol></section>
+<section class="prd-chapter" id="prd-ch4"><h2>三、用户角色与权限</h2>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>职责与权限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>履约负责人</td>
+<td>主操作角色。查看其负责的履约任务，可执行"跟进"（填写跟进记录）与"完成"（手动确认完成）操作；可切换按任务/按合同视角，按合同视角下可见其负责任务所属合同</td>
+</tr>
+<tr>
+<td>合同经办人</td>
+<td>主跟合同。查看经办合同的履约进度、节点明细与跟进记录（只读），不承担履约任务的跟进操作</td>
+</tr>
+<tr>
+<td>经办负责人</td>
+<td>日常查看本部门履约执行情况；任务逾期时接收升级知会（消息中心触达）</td>
+</tr>
+<tr>
+<td>分管领导/公司分管领导</td>
+<td>基于逾期升级通知触发查看，掌握逾期风险与处置进展</td>
+</tr>
+</tbody>
+</table>
+<p>权限设计原则：按任务/按合同页签不绑定角色，所有角色均可切换视角；数据可见范围由行级数据权限控制——履约负责人可见本人负责的任务及其所属合同，经办人可见本人经办合同，经办负责人及以上层级按数据权限范围逐级放大。</p></section>
+<section class="prd-chapter" id="prd-ch5"><h2>四、名词解释</h2>
+<table>
+<thead>
+<tr>
+<th>名词</th>
+<th>解释</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>履约任务</td>
+<td>合同履约计划拆分的最小执行单元，含计划完成时间与责任人</td>
+<td>移动端"按任务"视角的操作对象</td>
+</tr>
+<tr>
+<td>履约节点</td>
+<td>合同维度下履约任务的展示口径，节点明细按计划完成时间倒序排列</td>
+<td>最新节点在前</td>
+</tr>
+<tr>
+<td>履约类型</td>
+<td>履约节点的业务分类，取值六类：应付账款、应收账款、接受货物或服务、提供货物或劳务、发票开具、其他</td>
+<td>与Web端字典 performace_type 一致</td>
+</tr>
+<tr>
+<td>数据来源</td>
+<td>履约计划所属的外部业务系统：云销系统、招采系统；为空表示本系统录入</td>
+<td>与Web端字典 external_system 一致</td>
+</tr>
+<tr>
+<td>已超期</td>
+<td>超过履约到期时间仍未完成的进行中任务</td>
+<td>与Web端状态命名一致</td>
+</tr>
+<tr>
+<td>已终止</td>
+<td>因合同变更等原因终止的履约计划</td>
+<td>需展示终止说明与终止人</td>
+</tr>
+<tr>
+<td>工作进度</td>
+<td>已完成节点数占节点总数的百分比</td>
+<td>与资金进度并列展示，进度条为绿色</td>
+</tr>
+<tr>
+<td>资金进度</td>
+<td>已完成节点金额占节点总金额的百分比</td>
+<td>与工作进度并列展示，进度条为蓝色</td>
+</tr>
+<tr>
+<td>剩余天数</td>
+<td>履约到期时间与当前日期的差值</td>
+<td>正数显示"还剩N天"（绿色），负值显示"逾期N天"（红色）</td>
+</tr>
+</tbody>
+</table></section>
+<section class="prd-chapter" id="prd-ch6"><h2>五、功能详细需求</h2>
+<h3>5.1 双视图切换</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>履约负责人以任务为作业单元日常跟进，合同经办人以合同为主线掌握整体进度，两类用户需在同一组件内切换视角</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>组件顶部提供「按任务查询」「按合同查询」两个页签，默认进入「按任务查询」；页签切换不刷新页面，本地过滤视图</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>全部角色</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（顶部「按任务 / 按合同」视图页签）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 页签命名与Web端一致（按任务查询/按合同查询的移动端简写）<br>2. 页签不绑定角色，人人可切换<br>3. 数据可见范围由行级数据权限控制，与页签无关</td>
+</tr>
+</tbody>
+</table>
+<h3>5.2 履约任务列表（按任务视角）</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>履约负责人打开组件即查看本人履约任务全景，按状态快速过滤，定位待办与超期风险</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>页面结构：容器导航栏（返回/标题/更多）→搜索框（右侧筛选入口）→视图页签→任务状态页签→任务卡片列表。从工作台直入，无底部TabBar与页脚标语。状态页签横向滑动，右缘渐隐提示</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>履约负责人、经办负责人、分管领导</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（任务状态页签 + 任务卡片列表 + 搜索/筛选/完成）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 状态分类与Web端一致：全部、未开始、进行中、已超期、已完成、已终止，页签带计数<br>2. 默认展示"全部"并按剩余天数升序排列（最紧急在前）<br>3. 剩余天数=履约到期时间-当前日期，正数显示"还剩N天"（绿色）、负数显示"逾期N天"（红色）并转入已超期状态<br>4. 任务卡按状态展示差异化内容：进行中显示剩余天数与节点摘要；已超期显示升级链路；已终止显示终止说明与终止人；已完成显示完成时间与数据来源<br>5. 已终止任务随合同变更处理：合同再次变更后由Web端履约计划维护按变更结果重建或恢复，移动端跟随变更结果同步展示【已确认④】<br>6. 任务卡按完成方式区分展示：本系统录入（手动可完成）任务展示「完成」按钮，支持移动端确认完成并上传附件（word/jpg/png/PDF，单个≤50M、最多10个）；云销/招采等外部系统来源任务展示数据来源标识、由系统自动回写完成，不展示「完成」按钮，避免用户困惑【2026-10-10】<br>7. 页面入口：工作台常用功能宫格「合同履约」、待处理任务统计卡「合同履约」、今日待办提示条三处均可进入本页面；点击导航栏返回箭头回到工作台【2026-10-09确认】</td>
+</tr>
+</tbody>
+</table>
+<p>任务卡片输出字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>字段类型</th>
+<th>字段逻辑</th>
+<th>输入/输出</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任务名称</td>
+<td>文本（50）</td>
+<td>履约计划名称</td>
+<td>输出</td>
+<td>卡片标题，含状态标签</td>
+</tr>
+<tr>
+<td>所属合同</td>
+<td>文本（100）</td>
+<td>任务所属合同名称</td>
+<td>输出</td>
+<td>点击可跳转按合同视角</td>
+</tr>
+<tr>
+<td>合同编号</td>
+<td>文本（18）</td>
+<td>系统合同编号</td>
+<td>输出</td>
+<td>格式：HL+分类码8位+年份4位+序号4位，共18位</td>
+</tr>
+<tr>
+<td>履约类型</td>
+<td>枚举徽标</td>
+<td>六类：应付账款/应收账款/接受货物或服务/提供货物或劳务/发票开具/其他</td>
+<td>输出</td>
+<td>主色实底徽标展示</td>
+</tr>
+<tr>
+<td>履约负责人</td>
+<td>文本</td>
+<td>姓名（拼音）</td>
+<td>输出</td>
+<td>任务主责任人</td>
+</tr>
+<tr>
+<td>经办人</td>
+<td>文本</td>
+<td>姓名（拼音）</td>
+<td>输出</td>
+<td>合同经办人，与Web端列名一致</td>
+</tr>
+<tr>
+<td>经办人部门</td>
+<td>文本</td>
+<td>公司-部门-科室三级</td>
+<td>输出</td>
+<td>与Web端列名一致</td>
+</tr>
+<tr>
+<td>履约到期时间</td>
+<td>日期</td>
+<td>计划完成时间</td>
+<td>输出</td>
+<td>已完成任务替换为履约完成时间</td>
+</tr>
+<tr>
+<td>剩余天数</td>
+<td>数字</td>
+<td>到期时间-当前日期</td>
+<td>输出</td>
+<td>显示为"还剩N天"/"逾期N天"，仅未完成任务展示</td>
+</tr>
+<tr>
+<td>节点摘要</td>
+<td>文本</td>
+<td>最近跟进内容或当前进展</td>
+<td>输出</td>
+<td>进行中/未开始展示</td>
+</tr>
+<tr>
+<td>履约完成时间</td>
+<td>日期</td>
+<td>实际完成日期</td>
+<td>输出</td>
+<td>仅已完成任务展示</td>
+</tr>
+<tr>
+<td>数据来源</td>
+<td>枚举</td>
+<td>云销系统/招采系统</td>
+<td>输出</td>
+<td>外部来源任务进行中即展示（区分完成方式）；已完成任务展示完成来源</td>
+</tr>
+</tbody>
+</table>
+<p>操作说明：</p>
+<table>
+<thead>
+<tr>
+<th>操作名</th>
+<th>操作描述</th>
+<th>备注</th>
+<th>更新人/更新时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>状态过滤</td>
+<td>点击状态页签，列表本地过滤并保持计数</td>
+<td>支持横向滑动查看全部6个状态</td>
+<td>白林高 / 2026-09-21</td>
+</tr>
+<tr>
+<td>搜索</td>
+<td>搜索框输入合同编号/名称/履约任务关键词</td>
+<td>实时过滤</td>
+<td>白林高 / 2026-09-21</td>
+</tr>
+<tr>
+<td>高级筛选</td>
+<td>点击搜索框右侧筛选按钮，弹窗内按履约类型（多选）、时间范围筛选</td>
+<td>支持"近一个月/近三个月/自定义"</td>
+<td>白林高 / 2026-10-10</td>
+</tr>
+<tr>
+<td>查看跟进记录</td>
+<td>【二期】一期不提供跟进能力，任务卡不展示「跟进」入口</td>
+<td>随 Web 端跟进明细弹窗上线后二期移动化</td>
+<td>白林高 / 2026-10-10</td>
+</tr>
+<tr>
+<td>发起完成</td>
+<td>点击任务卡「完成」按钮打开完成确认弹窗（仅手动可完成任务展示该按钮）</td>
+<td>见5.4</td>
+<td>白林高 / 2026-10-10</td>
+</tr>
+</tbody>
+</table>
+<h3>5.3 跟进记录（二期）</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>履约负责人在外出或现场场景下，随时记录履约推进情况（如"发运计划已排定，预计09-25装船"），并向经办人同步进展</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>底部弹窗展示：上半部分为任务概要信息（所属合同、编号、履约类型、负责人、经办人、到期时间），中部为跟进记录流水，底部为跟进说明输入区与提交按钮</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>履约负责人（读写）；经办人、经办负责人（只读）</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（跟进记录底部弹窗：任务概要 + 跟进流水 + 输入区）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 跟进记录按时间倒序展示，最新在前，每条含记录内容、时间、记录人角色<br>2. 跟进说明为必填项，提交后即时追加至流水并同步经办人（站内消息）<br>3. 已终止任务仅可查看历史跟进记录，不可新增<br>4. 已完成任务可查看全部跟进记录及完成记录（含完成时间、数据来源）<br>5. 跟进附件（现场照片等）一期暂放，规划于二期【已确认③】</td>
+</tr>
+</tbody>
+</table>
+<p>输入字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>字段类型</th>
+<th>字段逻辑</th>
+<th>输入/输出</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>跟进说明</td>
+<td>多行文本（500）</td>
+<td>手动输入本次跟进内容</td>
+<td>输入</td>
+<td>必填，提交后不可修改</td>
+</tr>
+<tr>
+<td>跟进记录流水</td>
+<td>列表</td>
+<td>历史跟进内容+时间+记录人</td>
+<td>输出</td>
+<td>倒序，最新在前</td>
+</tr>
+</tbody>
+</table>
+<p>操作说明：</p>
+<table>
+<thead>
+<tr>
+<th>操作名</th>
+<th>操作描述</th>
+<th>备注</th>
+<th>更新人/更新时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>填写跟进</td>
+<td>输入区填写跟进说明，点击「提交跟进」</td>
+<td>提交成功后输入区清空，流水刷新</td>
+<td>白林高 / 2026-09-21</td>
+</tr>
+<tr>
+<td>取消</td>
+<td>点击「取消」或遮罩关闭弹窗</td>
+<td>不保存未提交内容</td>
+<td>白林高 / 2026-09-21</td>
+</tr>
+</tbody>
+</table>
+<h3>5.4 完成确认</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>履约负责人完成履约内容核验后，在移动端确认完成，并可上传完成凭证附件（验收单、结算单、发票等）</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>底部弹窗：顶部警告提示（"您正在进行履约任务的完成确认。若需上传附件，请点击下方区域上传；无需上传附件，直接点击确定即可"），中部为附件上传区（点击选择或拖拽文件），底部「确定」「取消」</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>履约负责人</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（完成确认底部弹窗：警告提示 + 附件上传区）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 附件为可选项，无需上传附件时可直接点击「确定」完成<br>2. 上传限制：支持 word/jpg/png/PDF 格式，单个文件大小不超过 50M，最多 10 个【已对齐真实系统】<br>3. 确认后任务状态即时更新为"已完成"，完成时间取系统当前时间<br>4. 已超期任务完成后，升级链路自动终止后续通知<br>5. 数据来源为外部系统（云销/招采）的计划，通常由外部系统回写完成状态，无需人工操作【已确认①】</td>
+</tr>
+</tbody>
+</table>
+<p>输入输出字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>字段类型</th>
+<th>字段逻辑</th>
+<th>输入/输出</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>完成附件</td>
+<td>文件</td>
+<td>可选，支持多文件上传</td>
+<td>输入</td>
+<td>格式与大小限制见业务规则</td>
+</tr>
+<tr>
+<td>完成时间</td>
+<td>日期</td>
+<td>提交时取系统当前时间</td>
+<td>输出</td>
+<td>自动记录</td>
+</tr>
+<tr>
+<td>任务状态</td>
+<td>枚举</td>
+<td>提交后更新为已完成</td>
+<td>输出</td>
+<td>同步刷新列表状态</td>
+</tr>
+</tbody>
+</table>
+<p>操作说明：</p>
+<table>
+<thead>
+<tr>
+<th>操作名</th>
+<th>操作描述</th>
+<th>备注</th>
+<th>更新人/更新时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上传附件</td>
+<td>点击上传区选择文件，或将文件拖拽至该区域</td>
+<td>可上传多个，最多10个</td>
+<td>白林高 / 2026-09-23</td>
+</tr>
+<tr>
+<td>确认完成</td>
+<td>点击「确定」提交；无附件时直接点击「确定」亦可</td>
+<td>附件非必填</td>
+<td>白林高 / 2026-09-23</td>
+</tr>
+<tr>
+<td>取消</td>
+<td>点击「取消」或遮罩关闭弹窗</td>
+<td>不产生状态变更</td>
+<td>白林高 / 2026-09-23</td>
+</tr>
+</tbody>
+</table>
+<h3>5.5 逾期升级展示</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>任务超期后按升级链路逐级通知：履约负责人→经办人→经办负责人→分管领导→公司分管领导；分管领导基于升级通知进入组件查看，需直观看到逾期时长与通知送达层级</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>已超期任务卡展示升级链路横幅（"已超期N天 · 升级通知已送达分管领导"）【一期】；跟进弹窗内提供升级记录时间轴（各层级送达时间）【二期，依赖升级通知机制上线】</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>经办负责人、分管领导、公司分管领导</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（已超期任务卡升级链路横幅 + 跟进弹窗升级记录时间轴）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 超期后触发升级通知，经消息中心推送，本组件只呈现送达层级，不重复建设通知列表<br>2. 升级时点按已规划的预期通知机制执行，经消息中心推送至各层级【已确认②】<br>3. 任务完成后升级链路自动终止</td>
+</tr>
+</tbody>
+</table>
+<h3>5.6 合同履约列表（按合同视角）</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>合同经办人主跟合同，需以合同为单位掌握履约整体进度，定位下一待办节点</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>状态页签（全部/进行中/未开始/已超期/已完成，带计数）+合同卡片列表。合同卡展示概要信息、节点统计、资金进度与工作进度</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>合同经办人、履约负责人、经办负责人</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（按合同视角合同卡片列表：节点统计 + 资金/工作进度）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 合同状态按其节点汇总状态判定：存在超期节点即"已超期"，全部节点完成即"已完成"<br>2. 卡片展示"下一节点"（进行中合同）或"未开始节点"（未开始合同）<br>3. 卡片操作：「履约记录」入口【一期】；「合同文本」在线预览【二期，一期如需查看请到 PC 端】</td>
+</tr>
+</tbody>
+</table>
+<p>合同卡片输出字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>字段类型</th>
+<th>字段逻辑</th>
+<th>输入/输出</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>合同名称</td>
+<td>文本（100）</td>
+<td>合同名称</td>
+<td>输出</td>
+<td>含合同状态标签</td>
+</tr>
+<tr>
+<td>合同编号</td>
+<td>文本（18）</td>
+<td>系统合同编号</td>
+<td>输出</td>
+<td></td>
+</tr>
+<tr>
+<td>合同金额</td>
+<td>金额</td>
+<td>合同含税总额</td>
+<td>输出</td>
+<td>千分位，单位CNY</td>
+</tr>
+<tr>
+<td>经办人</td>
+<td>文本</td>
+<td>合同经办人</td>
+<td>输出</td>
+<td></td>
+</tr>
+<tr>
+<td>履约期限</td>
+<td>日期区间</td>
+<td>履约起止日期</td>
+<td>输出</td>
+<td></td>
+</tr>
+<tr>
+<td>节点统计</td>
+<td>复合</td>
+<td>总数N·已完成N·逾期N</td>
+<td>输出</td>
+<td>已完成绿色、逾期红色</td>
+</tr>
+<tr>
+<td>资金进度</td>
+<td>百分比</td>
+<td>已完成节点金额/节点总金额</td>
+<td>输出</td>
+<td>蓝色进度条</td>
+</tr>
+<tr>
+<td>工作进度</td>
+<td>百分比</td>
+<td>已完成节点/节点总数</td>
+<td>输出</td>
+<td>绿色进度条，已完成态全绿</td>
+</tr>
+<tr>
+<td>下一节点</td>
+<td>复合</td>
+<td>最近待办节点名称+计划完成时间</td>
+<td>输出</td>
+<td>按状态差异化展示</td>
+</tr>
+</tbody>
+</table>
+<h3>5.7 履约记录</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>点击合同卡「节点明细」，查看该合同全部履约节点及执行状态，快速掌握整体推进节奏</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>底部弹窗：上半部分合同概要（名称、状态、编号、金额、经办人、履约期限、节点统计、资金进度、工作进度、查看合同文本入口），下半部分履约节点时间轴</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>全部角色（按数据权限）</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（履约记录底部弹窗：合同概要 + 履约节点时间轴）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 节点默认倒序排列，按计划完成时间从晚到早，最新节点在前【2026-09-21评审确认】<br>2. 每个节点行展示：履约类型徽标、节点名称、状态标签、计划完成时间<br>3. 时间轴连接线按节点状态着色（已完成绿/进行中蓝带光晕/超期红/未开始灰）</td>
+</tr>
+</tbody>
+</table>
+<h3>5.8 合同文本与附件（二期）</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户场景</td>
+<td>履约负责人现场核验需对照合同条款，经办人需查阅补充协议，需在移动端直接查看合同文本与附件</td>
+</tr>
+<tr>
+<td>功能说明</td>
+<td>双入口：合同卡「合同文本」按钮+节点明细概要区「查看合同文本与附件」按钮。底部弹窗展示附件清单：文件图标、文件名、大小、归档日期、归档版本说明、预览入口</td>
+</tr>
+<tr>
+<td>目标用户</td>
+<td>全部角色（按数据权限）</td>
+</tr>
+<tr>
+<td>界面原型</td>
+<td>合同履约-H5查询组件.html（合同文本与附件底部弹窗：附件清单 + 在线预览入口）</td>
+</tr>
+<tr>
+<td>业务规则</td>
+<td>1. 附件来源于合同归档库，移动端只读，支持在线预览，不支持上传与下载到本地<br>2. 附件类型含：合同正文（用印版）、补充协议、技术协议、报价明细单等，按归档库实际版本展示<br>3. 页面注明"文本与附件以合同归档库实际版本为准"<br>4. 归档库文件更新后移动端实时可见</td>
+</tr>
+</tbody>
+</table></section>
+<section class="prd-chapter" id="prd-ch7"><h2>六、非功能需求</h2>
+<ol>
+<li>端端一致性：字段命名、状态分类（未开始/进行中/已超期/已完成/已终止）、履约类型枚举（六类）、数据来源枚举、剩余天数文案均与Web端完全对齐；字段与枚举依据Web端源码（contract/performanceplans）逐项校准，完成动作对齐真实交互（上传附件）；</li>
+<li>数据同源：移动端与Web端读取同一履约数据服务，状态变更（含手动完成）实时同步PC端；</li>
+<li>性能：列表首屏加载≤2秒，状态过滤、页签切换本地完成无感知；</li>
+<li>安全：数据行级权限控制；合同文本附件仅在线预览不落地；页面遵循公司信息安全规范；</li>
+<li>兼容性：适配主流移动端浏览器与企业微信/门户容器，页签横向滑动兼容iOS橡皮筋效果。</li>
+</ol></section>
+<section class="prd-chapter" id="prd-ch8"><h2>七、评审结论与关联规划</h2>
+<p>2026-09-21 产品评审对待确认事项①~⑤逐项拍板，结论如下：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>事项</th>
+<th>评审结论</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>系统同步类任务手动完成入口</td>
+<td>保持由业务系统同步更新状态，移动端不提供手动完成入口</td>
+<td>已确认</td>
+</tr>
+<tr>
+<td>②</td>
+<td>逾期升级时点规则</td>
+<td>按已规划的预期通知机制执行，经消息中心推送</td>
+<td>已确认</td>
+</tr>
+<tr>
+<td>③</td>
+<td>跟进记录附件</td>
+<td>一期暂放（纯文本跟进）；同步规划Web端跟进明细弹窗作为关联需求</td>
+<td>已确认</td>
+</tr>
+<tr>
+<td>④</td>
+<td>已终止任务恢复机制</td>
+<td>按合同变更处理：随变更结果重建或恢复，移动端同步展示</td>
+<td>已确认</td>
+</tr>
+<tr>
+<td>⑤</td>
+<td>首期推广范围</td>
+<td>不在本PRD范围内考虑</td>
+<td>已关闭</td>
+</tr>
+</tbody>
+</table>
+<p>关联规划：Web端合同履约任务管理增加跟进明细弹窗，与移动端跟进记录能力对齐（PC端可查看/补录跟进流水），纳入Web端迭代需求池。</p></section>
+  </div>
+</div>
+</body>
+</html>
