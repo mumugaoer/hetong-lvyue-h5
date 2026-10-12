@@ -133,7 +133,7 @@
   .node-det-body .nrow .nvl em { font-style: normal; font-weight: 600; }
   .node-det-body .nrow .nvl.hl-g { color: #52C41A; }
   .node-det-body .nrow .nvl.hl-r { color: #DD473A; }
-  .node-det-body .nrow .nvl.hl-b { color: var(--primary); }
+  .node-det-body .nrow .nvl.hl-b { color: var(--t1); }
   .node-det-body .nrow .nvl .st-tag { font-size: 12px; }
   .node-det-body .nd-note { font-size: 12px; color: var(--t3); line-height: 19px; margin-top: 8px; padding: 9px 11px; background: #F7F8FA; border-radius: 6px; }
 
@@ -300,7 +300,11 @@
 
   /* 升级通知记录收起展开 */
   .esc-det { margin-top: 6px; }
-  .esc-det summary { list-style: none; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #DD473A; cursor: pointer; user-select: none; padding: 2px 0; }
+  .esc-det summary { list-style: none; display: flex; align-items: center; gap: 6px; padding: 5px 8px; margin-top: 4px; border-radius: 4px; background: #FEF0F0; font-size: 12px; cursor: pointer; user-select: none; }
+  .esc-det summary .d { color: #DD473A; font-weight: 600; }
+  .esc-det summary .v { margin-left: auto; color: var(--primary); font-weight: 500; }
+  .esc-det summary .v::before { content: "查看记录"; }
+  .esc-det[open] summary .v::before { content: "收起"; }
   .esc-det summary::-webkit-details-marker { display: none; }
   .esc-det .chev { transition: transform .18s ease; }
   .esc-det[open] .chev { transform: rotate(180deg); }
@@ -409,7 +413,7 @@
         <div class="info-row"><span class="lb">履约到期时间</span><span class="vl">2026-08-31</span></div>
         <div class="esc-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DD473A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span class="ex">逾期 21 天 · 升级通知已送达分管领导</span></div>
         <details class="esc-det">
-          <summary>通知记录（3）<svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#DD473A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <summary><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DD473A" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span class="d">逾期 21 天</span><span class="v"></span></summary>
           <div class="esc-list"><div class="esc-li"><span class="t">09-03 10:20</span><span>升级通知送达 经办负责人</span></div><div class="esc-li"><span class="t">09-07 10:20</span><span>升级通知送达 分管领导</span></div><div class="esc-li"><span class="t">09-14 10:20</span><span>升级通知送达 公司分管领导</span></div></div>
       
         </details>
@@ -426,7 +430,7 @@
         <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001010220260012" title="点击复制">HL0001010220260012<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">提供货物或劳务</span></span></div>
         <div class="info-row"><span class="lb">数据来源</span><span class="vl">云销系统</span></div>
-        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统自动完成</span></span></div>
+        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统完成</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">刘洋（LIUYANG）</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
         <div class="info-row"><span class="lb">经办人部门</span><span class="vl">南方贸易-市场部-合同科</span></div>
@@ -500,7 +504,7 @@
         <div class="info-row"><span class="lb">经办人部门</span><span class="vl">南方贸易-市场部-合同科</span></div>
         <div class="info-row"><span class="lb">履约完成时间</span><span class="vl">2026-08-30</span></div>
         <div class="info-row"><span class="lb">数据来源</span><span class="vl">财务系统</span></div>
-        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统自动完成</span></span></div>
+        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统完成</span></span></div>
         <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">回款到账 · 2026-08-30</span></div>
       <div class="card-foot"><label class="btn-ghost-sm" for="sheet-fatt">附件</label></div>
       </div>
@@ -519,7 +523,7 @@
         <div class="info-row"><span class="lb">经办人部门</span><span class="vl">港务公司-运输部-调度科</span></div>
         <div class="info-row"><span class="lb">履约完成时间</span><span class="vl">2026-08-31</span></div>
         <div class="info-row"><span class="lb">数据来源</span><span class="vl">招采系统</span></div>
-        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统自动完成</span></span></div>
+        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统完成</span></span></div>
         <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">结算完成 · 2026-08-31</span></div>
       <div class="card-foot"><label class="btn-ghost-sm" for="sheet-fatt">附件</label></div>
       </div>
@@ -538,7 +542,7 @@
         <div class="info-row"><span class="lb">经办人部门</span><span class="vl">装备公司-采购部-设备科</span></div>
         <div class="info-row"><span class="lb">履约完成时间</span><span class="vl">2026-06-28</span></div>
         <div class="info-row"><span class="lb">数据来源</span><span class="vl">云销系统</span></div>
-        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统自动完成</span></span></div>
+        <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统完成</span></span></div>
         <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">验收通过 · 2026-06-28</span></div>
       <div class="card-foot"><label class="btn-ghost-sm" for="sheet-fatt">附件</label></div>
       </div>
@@ -757,7 +761,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-05</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（云销系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">提供货物或劳务</span><span class="tl-name">第三批熟料发运</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-15</div>
@@ -767,7 +771,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-15</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（云销系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">第二期货款回收 30%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-28</div>
@@ -777,7 +781,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-28</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（云销系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">提供货物或劳务</span><span class="tl-name">第二批熟料发运</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-18</div>
@@ -787,7 +791,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-18</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（云销系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应收账款</span><span class="tl-name">首期货款回收 30%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-30</div>
@@ -797,7 +801,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-30</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（云销系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">提供货物或劳务</span><span class="tl-name">第一批熟料发运</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-20</div>
@@ -807,7 +811,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-20</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">刘洋（LIUYANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（云销系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
       </div>
@@ -875,7 +879,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-22</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">吴斌（WUBIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">首批设备到货</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-30</div>
@@ -885,7 +889,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-30</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">吴斌（WUBIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">预付款支付 30%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-20</div>
@@ -895,7 +899,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-20</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">吴斌（WUBIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
       </div>
@@ -956,7 +960,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-10</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">7月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-31</div>
@@ -966,7 +970,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-31</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">6月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-06-30</div>
@@ -976,7 +980,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-30</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">5月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-31</div>
@@ -986,7 +990,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-31</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">4月对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-04-30</div>
@@ -996,7 +1000,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-04-30</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-dep">其他</span><span class="tl-name">一季度对账单确认</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-03-31</div>
@@ -1006,7 +1010,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-03-31</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">陈敏（CHENMIN）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
       </div>
@@ -1065,7 +1069,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-18</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">首批货款支付 40%</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-25</div>
@@ -1075,7 +1079,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-25</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">第一批备件到货</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-07-20</div>
@@ -1085,7 +1089,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-07-20</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">周涛（ZHOUTAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
       </div>
@@ -1124,7 +1128,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-31</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">三季度运输计划执行</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-08-25</div>
@@ -1134,7 +1138,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-25</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">二季度运费结算</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-05-12</div>
@@ -1144,7 +1148,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-05-12</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">二季度运输计划执行</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-04-30</div>
@@ -1154,7 +1158,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-04-30</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">应付账款</span><span class="tl-name">一季度运费结算</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-02-10</div>
@@ -1164,7 +1168,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-02-10</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">一季度运输计划执行</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2026-01-31</div>
@@ -1174,7 +1178,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-01-31</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">孙浩（SUNHAO）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
       </div>
@@ -1242,7 +1246,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-08-30</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">云销系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">郑洁（ZHENGJIE）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（云销系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
       </div>
@@ -1281,7 +1285,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2026-06-28</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">王强（WANGQIANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">安装调试完成</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2025-12-20</div>
@@ -1291,7 +1295,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2025-12-20</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">王强（WANGQIANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
         <div class="tl-item i-done"><i class="tl-dot"></i><div class="tl-top"><span class="pt-tag pt-pay">接受货物或服务</span><span class="tl-name">输送带到货</span><span class="st-tag st-green">已完成</span></div><div class="tl-date">计划完成 2025-10-15</div>
@@ -1301,7 +1305,7 @@
           <div class="nrow"><span class="nlb">履约完成时间</span><span class="nvl hl-g">2025-10-15</span></div>
           <div class="nrow"><span class="nlb">数据来源</span><span class="nvl hl-b">招采系统</span></div>
           <div class="nrow"><span class="nlb">完成人</span><span class="nvl">王强（WANGQIANG）</span></div>
-            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统自动回写（招采系统）</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动回写完成，完成时间与数据来源系统留痕。</div>
+            <div class="nrow"><span class="nlb">完成方式</span><span class="nvl">系统完成</span></div><div class="att-list" style="margin-top:8px;"><div class="att-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2978FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/></svg><span class="att-name">对账确认单.pdf</span><span class="att-size">210KB</span><span class="att-view">查看</span></div></div><div class="nd-note">该节点由业务系统自动完成，完成时间与数据来源系统留痕。</div>
           </div>
         </details></div>
       </div>
@@ -1669,7 +1673,7 @@
 </tr>
 <tr>
 <td>业务规则</td>
-<td>1. 状态分类与Web端一致：全部、未开始、进行中、已超期、已完成、已终止，页签带计数<br>2. 默认展示"全部"，按剩余天数升序排列（最紧急在前）<br>3. 剩余天数=履约到期时间-当前日期，正数显示"还剩N天"（绿色）、负数显示"逾期N天"（红色）并转入已超期状态<br>4. 任务卡按状态差异化展示：进行中显示剩余天数与节点摘要；已超期显示升级链路；已终止显示终止说明与终止人；已完成显示完成时间与数据来源<br>5. 已终止任务随合同变更处理，由Web端履约计划维护按变更结果重建或恢复，移动端同步展示<br>6. 任务卡按完成方式区分：本系统录入任务展示「完成」按钮（见5.4）；外部系统来源任务展示数据来源标识、由系统自动回写完成，不展示「完成」按钮<br>7. 页面入口：工作台常用功能宫格、待处理任务统计卡、今日待办提示条三处进入，导航栏返回箭头回到工作台</td>
+<td>1. 状态分类与Web端一致：全部、未开始、进行中、已超期、已完成、已终止，页签带计数<br>2. 默认展示"全部"，按剩余天数升序排列（最紧急在前）<br>3. 剩余天数=履约到期时间-当前日期，正数显示"还剩N天"（绿色）、负数显示"逾期N天"（红色）并转入已超期状态<br>4. 任务卡按状态差异化展示：进行中显示剩余天数与节点摘要；已超期显示升级链路；已终止显示终止说明与终止人；已完成显示完成时间与数据来源<br>5. 已终止任务随合同变更处理，由Web端履约计划维护按变更结果重建或恢复，移动端同步展示<br>6. 任务卡按完成方式区分（色块标识直观区分）：本系统录入任务标识「手动完成」（橙色）、展示「完成」按钮（见5.4）；外部系统来源任务标识「系统完成」（蓝色）、展示数据来源，由业务系统回写完成状态，不展示「完成」按钮<br>7. 页面入口：工作台常用功能宫格、待处理任务统计卡、今日待办提示条三处进入，导航栏返回箭头回到工作台</td>
 </tr>
 </tbody>
 </table>
@@ -1697,14 +1701,14 @@
 <td>文本（100）</td>
 <td>任务所属合同名称</td>
 <td>输出</td>
-<td>点击跳转按合同视角</td>
+<td>蓝色链接，点击跳转按合同视角</td>
 </tr>
 <tr>
 <td>合同编号</td>
 <td>文本（18）</td>
 <td>系统合同编号</td>
 <td>输出</td>
-<td>HL+分类码8位+年份4位+序号4位，共18位</td>
+<td>HL+分类码8位+年份4位+序号4位，共18位；蓝色可点击一键复制</td>
 </tr>
 <tr>
 <td>履约类型</td>
@@ -1767,7 +1771,14 @@
 <td>枚举</td>
 <td>云销/招采/财务系统</td>
 <td>输出</td>
-<td>外部来源任务进行中即展示（区分完成方式）；已完成任务展示完成来源</td>
+<td>外部来源任务进行中即展示；已完成任务展示完成来源</td>
+</tr>
+<tr>
+<td>完成方式</td>
+<td>枚举标识</td>
+<td>系统自动完成/手动完成</td>
+<td>输出</td>
+<td>色块标识直观区分（系统=蓝、手动=橙）；手动完成任务展示「完成」按钮</td>
 </tr>
 </tbody>
 </table>
@@ -1882,7 +1893,7 @@
 </tr>
 <tr>
 <td>功能说明</td>
-<td>底部弹窗：履约计划附件查看区（来自Web端履约计划维护，只读）+ 附件上传区 +「确认完成」「取消」</td>
+<td>底部弹窗：履约计划参考附件查看区（履约计划维护时上传，只读）+ 完成凭证附件上传区 +「确认完成」「取消」</td>
 </tr>
 <tr>
 <td>目标用户</td>
@@ -1911,11 +1922,11 @@
 </thead>
 <tbody>
 <tr>
-<td>履约计划附件</td>
+<td>履约计划参考附件</td>
 <td>文件列表</td>
-<td>履约计划维护时上传的附件</td>
+<td>履约计划维护时上传的参考附件</td>
 <td>输出</td>
-<td>只读查看</td>
+<td>只读查看，与完成凭证区分</td>
 </tr>
 <tr>
 <td>完成附件</td>
@@ -1955,7 +1966,7 @@
 </tr>
 <tr>
 <td>功能说明</td>
-<td>已超期任务卡展示升级链路横幅（"逾期N天 · 升级通知已送达分管领导"）；升级记录时间轴（各层级送达时间）随跟进记录能力二期提供</td>
+<td>已超期任务卡展示升级链路横幅，送达记录默认收起、点击「通知记录」展开（时间+层级）；超期节点详情同步展示送达记录；升级记录时间轴完整形态随跟进记录能力二期提供</td>
 </tr>
 <tr>
 <td>目标用户</td>
@@ -2106,7 +2117,7 @@
 </tr>
 <tr>
 <td>业务规则</td>
-<td>1. 节点按计划完成时间倒序排列，最新在前<br>2. 每个节点行展示：履约类型徽标、节点名称、状态标签、计划完成时间<br>3. 时间轴连接线按节点状态着色（已完成绿/进行中蓝/超期红/未开始灰）</td>
+<td>1. 节点按计划完成时间倒序排列，最新在前<br>2. 每个节点行展示：履约类型徽标、节点名称、状态标签、计划完成时间<br>3. 时间轴连接线统一主题色，节点状态由圆点与状态标签表达<br>4. 节点详情按状态差异化展示：已完成节点含完成时间、完成方式（系统完成/手动确认上传附件）、完成凭证附件；未开始/进行中节点展示履约计划相关附件；超期节点展示升级通知送达记录</td>
 </tr>
 </tbody>
 </table>
@@ -2153,7 +2164,7 @@
 </div>
 
 <script>
-/* PRD悬浮球拖动（增强功能·铁律11白名单：禁JS环境降级为右侧固定位置，点击开合不受影响） */
+/* PRD悬浮球拖动 + 编号复制（增强功能·铁律11白名单：禁JS环境降级，点击开合/页面功能不受影响） */
 (function(){
   var btn = document.getElementById('prdFloatBtn');
   if (!btn) return;
@@ -2179,6 +2190,8 @@
   });
   window.addEventListener('pointerup', function(){ drag = false; btn.style.transition = ''; });
   btn.addEventListener('click', function(e){ if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+})();
+(function(){
   document.querySelectorAll('.num-copy').forEach(function(el){
     el.addEventListener('click', function(e){
       e.stopPropagation(); e.preventDefault();
