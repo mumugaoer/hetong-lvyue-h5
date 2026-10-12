@@ -300,6 +300,23 @@
   .mode-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; line-height: 15px; font-weight: 500; }
   .m-sys { color: #2978FF; background: rgba(41,120,255,0.10); }
   .m-man { color: #FA8C16; background: rgba(250,140,22,0.10); }
+
+  /* 升级通知记录收起展开 */
+  .esc-det { margin-top: 6px; }
+  .esc-det summary { list-style: none; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #DD473A; cursor: pointer; user-select: none; padding: 2px 0; }
+  .esc-det summary::-webkit-details-marker { display: none; }
+  .esc-det .chev { transition: transform .18s ease; }
+  .esc-det[open] .chev { transform: rotate(180deg); }
+  .esc-det .esc-list { margin-top: 2px; }
+
+  /* 附件按钮（蓝色描边） */
+  .btn-ghost-sm { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 18px; border-radius: 17px; background: #FFFFFF; border: 1px solid var(--primary); color: var(--primary); font-size: 14px; font-weight: 500; cursor: pointer; user-select: none; }
+  .btn-ghost-sm:active { background: rgba(41,120,255,0.06); }
+
+  /* 合同编号复制 + 所属合同跳转 */
+  .num-copy { display: inline-flex; align-items: center; gap: 4px; color: var(--primary); cursor: pointer; font-variant-numeric: tabular-nums; }
+  .num-copy.copied { color: var(--success); }
+  .link-jump { color: var(--primary); cursor: pointer; user-select: none; }
 </style>
 </head>
 <body>
@@ -385,8 +402,8 @@
         <span class="st-tag st-red">已超期</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">电力物资年度框架合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001050320260015</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">电力物资年度框架合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001050320260015" title="点击复制">HL0001050320260015<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-dep">其他</span></span></div>
         <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-man">手动完成</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">陈敏（CHENMIN）</span></div>
@@ -394,7 +411,11 @@
         <div class="info-row"><span class="lb">经办人部门</span><span class="vl">南方贸易-市场部-合同科</span></div>
         <div class="info-row"><span class="lb">履约到期时间</span><span class="vl">2026-08-31</span></div>
         <div class="esc-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DD473A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span class="ex">逾期 21 天 · 升级通知已送达分管领导</span></div>
-        <div class="esc-list"><div class="esc-li"><span class="t">09-03 10:20</span><span>升级通知送达 经办负责人</span></div><div class="esc-li"><span class="t">09-07 10:20</span><span>升级通知送达 分管领导</span></div><div class="esc-li"><span class="t">09-14 10:20</span><span>升级通知送达 公司分管领导</span></div></div>
+        <details class="esc-det">
+          <summary>通知记录（3）<svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#DD473A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="esc-list"><div class="esc-li"><span class="t">09-03 10:20</span><span>升级通知送达 经办负责人</span></div><div class="esc-li"><span class="t">09-07 10:20</span><span>升级通知送达 分管领导</span></div><div class="esc-li"><span class="t">09-14 10:20</span><span>升级通知送达 公司分管领导</span></div></div>
+      
+        </details>
       <div class="card-foot"><label class="btn-detail" for="sheet-fc">完成</label></div>
       </div>
     </div>
@@ -404,10 +425,10 @@
         <span class="st-tag st-blue">进行中</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">海螺水泥熟料销售合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010220260012</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">海螺水泥熟料销售合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001010220260012" title="点击复制">HL0001010220260012<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">提供货物或劳务</span></span></div>
-        <div class="info-row"><span class="lb">数据来源</span><span class="vl">云销系统（自动回写）</span></div>
+        <div class="info-row"><span class="lb">数据来源</span><span class="vl">云销系统</span></div>
         <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统自动完成</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">刘洋（LIUYANG）</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
@@ -422,8 +443,8 @@
         <span class="st-tag st-blue">进行中</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">矿山设备采购合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">矿山设备采购合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001020120260008" title="点击复制">HL0001020120260008<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
         <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-man">手动完成</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">吴斌（WUBIN）</span></div>
@@ -440,8 +461,8 @@
         <span class="st-tag st-gray">未开始</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">备品备件供货合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001030220260021</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">备品备件供货合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001030220260021" title="点击复制">HL0001030220260021<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
         <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-man">手动完成</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">周涛（ZHOUTAO）</span></div>
@@ -458,8 +479,8 @@
         <span class="st-tag st-red">已终止</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">矿山设备采购合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">矿山设备采购合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001020120260008" title="点击复制">HL0001020120260008<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">吴斌（WUBIN）</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
@@ -474,14 +495,14 @@
         <span class="st-tag st-green">已完成</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">钢材购销合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010120260027</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">钢材购销合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001010120260027" title="点击复制">HL0001010120260027<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">应收账款</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">郑洁（ZHENGJIE）</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
         <div class="info-row"><span class="lb">经办人部门</span><span class="vl">南方贸易-市场部-合同科</span></div>
         <div class="info-row"><span class="lb">履约完成时间</span><span class="vl">2026-08-30</span></div>
-        <div class="info-row"><span class="lb">数据来源</span><span class="vl">财务系统（系统完成）</span></div>
+        <div class="info-row"><span class="lb">数据来源</span><span class="vl">财务系统</span></div>
         <div class="info-row"><span class="lb">完成方式</span><span class="vl"><span class="mode-tag m-sys">系统自动完成</span></span></div>
         <div class="node-row"><i class="nd" style="background:#52C41A"></i><span class="nx">回款到账 · 2026-08-30</span></div>
       <div class="card-foot"><label class="btn-ghost-sm" for="sheet-fatt">附件</label></div>
@@ -493,8 +514,8 @@
         <span class="st-tag st-green">已完成</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">熟料水路运输合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001040120250033</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">熟料水路运输合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001040120250033" title="点击复制">HL0001040120250033<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">应付账款</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">孙浩（SUNHAO）</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">孙浩（SUNHAO）</span></div>
@@ -512,8 +533,8 @@
         <span class="st-tag st-green">已完成</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">所属合同</span><span class="vl">输送带采购合同</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020220250041</span></div>
+        <div class="info-row"><span class="lb">所属合同</span><span class="vl"><label class="link-jump" for="view-contract" title="点击查看合同履约">输送带采购合同</label></span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001020220250041" title="点击复制">HL0001020220250041<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">履约类型</span><span class="pts"><span class="pt-tag pt-pay">接受货物或服务</span></span></div>
         <div class="info-row"><span class="lb">履约负责人</span><span class="vl">王强（WANGQIANG）</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
@@ -548,7 +569,7 @@
         <span class="st-tag st-blue">进行中</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010220260012</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001010220260012" title="点击复制">HL0001010220260012<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">12,800,000.00 CNY</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-05-01 ~ 2026-11-30</span></div>
@@ -567,7 +588,7 @@
         <span class="st-tag st-blue">进行中</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001020120260008" title="点击复制">HL0001020120260008<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">3,560,000.00 CNY</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-06-10 ~ 2026-12-20</span></div>
@@ -586,7 +607,7 @@
         <span class="st-tag st-red">已超期</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001050320260015</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001050320260015" title="点击复制">HL0001050320260015<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">486,000.00 CNY</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">陈敏（CHENMIN）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-01-01 ~ 2026-12-31</span></div>
@@ -605,7 +626,7 @@
         <span class="st-tag st-gray">未开始</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001030220260021</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001030220260021" title="点击复制">HL0001030220260021<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">1,260,000.00 CNY</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">赵磊（ZHAOLEI）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-07-01 ~ 2026-10-31</span></div>
@@ -624,7 +645,7 @@
         <span class="st-tag st-green">已完成</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001040120250033</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001040120250033" title="点击复制">HL0001040120250033<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">8,920,000.00 CNY</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">孙浩（SUNHAO）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-11-01 ~ 2026-08-31</span></div>
@@ -643,7 +664,7 @@
         <span class="st-tag st-blue">进行中</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010120260027</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001010120260027" title="点击复制">HL0001010120260027<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">2,340,000.00 CNY</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-08-01 ~ 2027-02-28</span></div>
@@ -662,7 +683,7 @@
         <span class="st-tag st-green">已完成</span>
       </div>
       <div class="card-body">
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020220250041</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001020220250041" title="点击复制">HL0001020220250041<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl amt">658,000.00 CNY</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-09-01 ~ 2026-06-30</span></div>
@@ -692,7 +713,7 @@
     <div class="sheet-body">
       <div class="d-sum">
         <div class="d-name">海螺水泥熟料销售合同 <span class="st-tag st-blue" style="margin-left:6px;">进行中</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010220260012</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001010220260012" title="点击复制">HL0001010220260012<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">12,800,000.00 元</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-05-01 ~ 2026-11-30</span></div>
@@ -810,7 +831,7 @@
     <div class="sheet-body">
       <div class="d-sum">
         <div class="d-name">矿山设备采购合同 <span class="st-tag st-blue" style="margin-left:6px;">进行中</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020120260008</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001020120260008" title="点击复制">HL0001020120260008<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">3,560,000.00 元</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-06-10 ~ 2026-12-20</span></div>
@@ -898,7 +919,7 @@
     <div class="sheet-body">
       <div class="d-sum">
         <div class="d-name">电力物资年度框架合同 <span class="st-tag st-red" style="margin-left:6px;">已超期</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001050320260015</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001050320260015" title="点击复制">HL0001050320260015<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">486,000.00 元</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">陈敏（CHENMIN）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-01-01 ~ 2026-12-31</span></div>
@@ -1009,7 +1030,7 @@
     <div class="sheet-body">
       <div class="d-sum">
         <div class="d-name">备品备件供货合同 <span class="st-tag st-gray" style="margin-left:6px;">未开始</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001030220260021</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001030220260021" title="点击复制">HL0001030220260021<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">1,260,000.00 元</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">赵磊（ZHAOLEI）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-07-01 ~ 2026-10-31</span></div>
@@ -1088,7 +1109,7 @@
     <div class="sheet-body">
       <div class="d-sum">
         <div class="d-name">熟料水路运输合同 <span class="st-tag st-green" style="margin-left:6px;">已完成</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001040120250033</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001040120250033" title="点击复制">HL0001040120250033<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">8,920,000.00 元</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">孙浩（SUNHAO）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-11-01 ~ 2026-08-31</span></div>
@@ -1177,7 +1198,7 @@
     <div class="sheet-body">
       <div class="d-sum">
         <div class="d-name">钢材购销合同 <span class="st-tag st-blue" style="margin-left:6px;">进行中</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001010120260027</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001010120260027" title="点击复制">HL0001010120260027<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">2,340,000.00 元</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">李娜（LINA）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2026-08-01 ~ 2027-02-28</span></div>
@@ -1245,7 +1266,7 @@
     <div class="sheet-body">
       <div class="d-sum">
         <div class="d-name">输送带采购合同 <span class="st-tag st-green" style="margin-left:6px;">已完成</span></div>
-        <div class="info-row"><span class="lb">合同编号</span><span class="vl">HL0001020220250041</span></div>
+        <div class="info-row"><span class="lb">合同编号</span><span class="vl"><span class="num-copy" data-copy="HL0001020220250041" title="点击复制">HL0001020220250041<svg class="cp" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span></span></div>
         <div class="info-row"><span class="lb">合同金额</span><span class="vl" style="color:#D97706;font-weight:600;">658,000.00 元</span></div>
         <div class="info-row"><span class="lb">经办人</span><span class="vl">王强（WANGQIANG）</span></div>
         <div class="info-row"><span class="lb">履约期限</span><span class="vl">2025-09-01 ~ 2026-06-30</span></div>
@@ -2161,6 +2182,15 @@
   });
   window.addEventListener('pointerup', function(){ drag = false; btn.style.transition = ''; });
   btn.addEventListener('click', function(e){ if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+  document.querySelectorAll('.num-copy').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.stopPropagation(); e.preventDefault();
+      var t = el.getAttribute('data-copy');
+      if (navigator.clipboard) navigator.clipboard.writeText(t);
+      el.classList.add('copied');
+      setTimeout(function(){ el.classList.remove('copied'); }, 1200);
+    });
+  });
 })();
 </script>
 </body>
