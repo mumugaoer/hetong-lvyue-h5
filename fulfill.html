@@ -244,11 +244,8 @@
   .tl-item:last-child { padding-bottom: 2px; }
   .tl-item::before { content: ""; position: absolute; left: 5px; top: 14px; bottom: -2px; width: 1px; background: var(--line); }
   .tl-item:last-child::before { display: none; }
-  /* 连接线按节点状态着色（PRD 5.7 规则3） */
-  .tl-item.i-done::before { background: var(--success); }
-  .tl-item.i-doing::before { background: var(--primary); box-shadow: 0 0 4px rgba(41,120,255,0.35); }
-  .tl-item.i-warn::before { background: var(--warning); }
-  .tl-item.i-err::before { background: var(--error); }
+  /* 连接线统一主题色（2026-10-12 用户裁定，状态由圆点与标签表达） */
+  .tl-item::before { background: var(--primary); }
   .tl-dot { position: absolute; left: 0; top: 4px; width: 11px; height: 11px; border-radius: 50%; background: #FFFFFF; border: 2px solid #C9D4E5; }
   .tl-item.i-done  .tl-dot { border-color: var(--success); background: var(--success); }
   .tl-item.i-doing .tl-dot { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 3px rgba(41,120,255,0.15); }
